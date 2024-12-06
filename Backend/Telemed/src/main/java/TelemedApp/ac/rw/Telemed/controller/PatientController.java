@@ -28,10 +28,15 @@ public class PatientController {
         return patient != null ? ResponseEntity.ok(patient) : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/email/{email}")
-    public ResponseEntity<Patient> getPatientByEmail(@PathVariable String email) {
+    @GetMapping("/email/{email}" )
+    public ResponseEntity<?> getPatientByEmail(@PathVariable String email) {
         Patient patient = patientService.getPatientByEmail(email);
-        return patient != null ? ResponseEntity.ok(patient) : ResponseEntity.notFound().build();
+        if (patient != null) {
+            return ResponseEntity.ok(patient);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
     @PostMapping(value="/savePatients", produces = MediaType.APPLICATION_JSON_VALUE ,consumes = MediaType.APPLICATION_JSON_VALUE)

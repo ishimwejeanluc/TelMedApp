@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Service
 public class UserService {
-    
+
     @Autowired
     private UserRepository userRepository;
 
@@ -30,7 +30,11 @@ public class UserService {
     }
 
     public User saveUser(User user) {
-        return userRepository.save(user);
+        User userFound = userRepository.findByEmail(user.getEmail());
+        if (userFound == null) {
+            return userRepository.save(user);
+        }
+        return null;
     }
 
     public void deleteUser(UUID id) {

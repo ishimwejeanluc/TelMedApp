@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/doctors", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/doctors")
 @CrossOrigin
 public class DoctorController {
 
@@ -40,9 +40,12 @@ public class DoctorController {
         return doctor != null ? ResponseEntity.ok(doctor) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Doctor createDoctor(@RequestBody Doctor doctor) {
-        return doctorService.saveDoctor(doctor);
+    @PostMapping(value="/registerDoctor", produces= MediaType.APPLICATION_JSON_VALUE , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createDoctor(@RequestBody Doctor doctor) {
+        if (doctorService.getDoctorByEmail(doctor.getEmail()) != null) {
+            return ResponseEntity.badRequest().body("Doctor Already exists");
+        }
+        return ResponseEntity.ok(doctorService.saveDoctor(doctor));
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)

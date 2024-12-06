@@ -23,59 +23,83 @@ public class SearchService {
         Root<Patient> root = cq.from(Patient.class);
 
         List<Predicate> predicates = new ArrayList<>();
-        
+
         predicates.add(cb.like(cb.lower(root.get("name")), "%" + query.toLowerCase() + "%"));
         predicates.add(cb.like(cb.lower(root.get("email")), "%" + query.toLowerCase() + "%"));
         predicates.add(cb.like(cb.lower(root.get("phone")), "%" + query.toLowerCase() + "%"));
-        
+        predicates.add(cb.like(cb.lower(root.get("address")), "%" + query.toLowerCase() + "%"));
+        if (query.equalsIgnoreCase("MALE") || query.equalsIgnoreCase("FEMALE")) {
+            predicates.add(cb.equal(root.get("gender"), Gender.valueOf(query.toUpperCase())));
+        }
+
         cq.where(cb.or(predicates.toArray(new Predicate[0])));
         return entityManager.createQuery(cq).getResultList();
     }
 
     public List<Doctor> searchDoctors(String query) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        try{CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Doctor> cq = cb.createQuery(Doctor.class);
         Root<Doctor> root = cq.from(Doctor.class);
 
         List<Predicate> predicates = new ArrayList<>();
-        
+
         predicates.add(cb.like(cb.lower(root.get("name")), "%" + query.toLowerCase() + "%"));
         predicates.add(cb.like(cb.lower(root.get("specialization")), "%" + query.toLowerCase() + "%"));
         predicates.add(cb.like(cb.lower(root.get("email")), "%" + query.toLowerCase() + "%"));
         predicates.add(cb.like(cb.lower(root.get("licenseNumber")), "%" + query.toLowerCase() + "%"));
-        
+
         cq.where(cb.or(predicates.toArray(new Predicate[0])));
         return entityManager.createQuery(cq).getResultList();
+        } catch(Exception e){
+            System.out.println(e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     public List<MedicalRecord> searchMedicalRecords(String query) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<MedicalRecord> cq = cb.createQuery(MedicalRecord.class);
-        Root<MedicalRecord> root = cq.from(MedicalRecord.class);
+        try {
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            CriteriaQuery<MedicalRecord> cq = cb.createQuery(MedicalRecord.class);
+            Root<MedicalRecord> root = cq.from(MedicalRecord.class);
 
-        List<Predicate> predicates = new ArrayList<>();
-        
-        predicates.add(cb.like(cb.lower(root.get("condition")), "%" + query.toLowerCase() + "%"));
-        predicates.add(cb.like(cb.lower(root.get("treatment")), "%" + query.toLowerCase() + "%"));
-        predicates.add(cb.like(cb.lower(root.get("notes")), "%" + query.toLowerCase() + "%"));
-        
-        cq.where(cb.or(predicates.toArray(new Predicate[0])));
-        return entityManager.createQuery(cq).getResultList();
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(cb.like(cb.lower(root.get("condition")), "%" + query.toLowerCase() + "%"));
+            predicates.add(cb.like(cb.lower(root.get("treatment")), "%" + query.toLowerCase() + "%"));
+            predicates.add(cb.like(cb.lower(root.get("notes")), "%" + query.toLowerCase() + "%"));
+
+            cq.where(cb.or(predicates.toArray(new Predicate[0])));
+            return entityManager.createQuery(cq).getResultList();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ArrayList<>();
+
+        }
+
     }
 
     public List<Appointment> searchAppointments(String query) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Appointment> cq = cb.createQuery(Appointment.class);
-        Root<Appointment> root = cq.from(Appointment.class);
+        try {
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            CriteriaQuery<Appointment> cq = cb.createQuery(Appointment.class);
+            Root<Appointment> root = cq.from(Appointment.class);
 
-        List<Predicate> predicates = new ArrayList<>();
-        
-        predicates.add(cb.like(cb.lower(root.get("appointmentDate")), "%" + query.toLowerCase() + "%"));
-        predicates.add(cb.like(cb.lower(root.get("status")), "%" + query.toLowerCase() + "%"));
-        predicates.add(cb.like(cb.lower(root.get("notes")), "%" + query.toLowerCase() + "%"));
-        
-        cq.where(cb.or(predicates.toArray(new Predicate[0])));
-        return entityManager.createQuery(cq).getResultList();
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(cb.like(cb.lower(root.get("appointmentDate")), "%" + query.toLowerCase() + "%"));
+            predicates.add(cb.like(cb.lower(root.get("status")), "%" + query.toLowerCase() + "%"));
+            predicates.add(cb.like(cb.lower(root.get("notes")), "%" + query.toLowerCase() + "%"));
+
+            cq.where(cb.or(predicates.toArray(new Predicate[0])));
+            return entityManager.createQuery(cq).getResultList();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ArrayList<>();
+
+        }
+
     }
 
     // Combined search across all entities
@@ -83,8 +107,8 @@ public class SearchService {
         SearchResult result = new SearchResult();
         result.setPatients(searchPatients(query));
         result.setDoctors(searchDoctors(query));
-        result.setMedicalRecords(searchMedicalRecords(query));
-        result.setAppointments(searchAppointments(query));
+        // result.setMedicalRecords(searchMedicalRecords(query));
+        // result.setAppointments(searchAppointments(query));
         return result;
     }
 }

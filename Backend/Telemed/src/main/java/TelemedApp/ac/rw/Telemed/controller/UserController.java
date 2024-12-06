@@ -2,10 +2,14 @@ package TelemedApp.ac.rw.Telemed.controller;
 
 import TelemedApp.ac.rw.Telemed.modal.User;
 import TelemedApp.ac.rw.Telemed.service.UserService;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.MediaType;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -39,11 +43,16 @@ public class UserController {
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.saveUser(user);
-    }
+    @PostMapping(value = "/saveUser", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) {
+    User savedUser = userService.saveUser(user);
 
+    if (savedUser != null) {
+        return ResponseEntity.ok(Map.of("message", "User created successfully", "user", savedUser));
+    } else {
+        return ResponseEntity.badRequest().body(Map.of("error", "User already exists"));
+    }
+}
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable UUID id, @RequestBody User user) {
         User existingUser = userService.getUserById(id);
@@ -63,4 +72,5 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }
+
 }

@@ -8,10 +8,11 @@ public class SearchResult {
     private List<Doctor> doctors = new ArrayList<>();
     private List<MedicalRecord> medicalRecords = new ArrayList<>();
     private List<Appointment> appointments = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
 
-    // Getters and Setters
+
     public List<Patient> getPatients() {
-        return patients;
+        return this.patients;
     }
 
     public void setPatients(List<Patient> patients) {
@@ -19,7 +20,7 @@ public class SearchResult {
     }
 
     public List<Doctor> getDoctors() {
-        return doctors;
+        return this.doctors;
     }
 
     public void setDoctors(List<Doctor> doctors) {
@@ -27,7 +28,7 @@ public class SearchResult {
     }
 
     public List<MedicalRecord> getMedicalRecords() {
-        return medicalRecords;
+        return this.medicalRecords;
     }
 
     public void setMedicalRecords(List<MedicalRecord> medicalRecords) {
@@ -35,10 +36,22 @@ public class SearchResult {
     }
 
     public List<Appointment> getAppointments() {
-        return appointments;
+        return this.appointments;
     }
 
     public void setAppointments(List<Appointment> appointments) {
         this.appointments = appointments;
     }
+
+    public List<User> getUsers() {
+        return this.users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+
+
+
 }
