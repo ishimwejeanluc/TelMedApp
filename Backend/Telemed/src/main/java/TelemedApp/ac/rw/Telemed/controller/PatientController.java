@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/patients", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin
+@RequestMapping(value = "/api/patients", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PatientController {
 
     @Autowired
