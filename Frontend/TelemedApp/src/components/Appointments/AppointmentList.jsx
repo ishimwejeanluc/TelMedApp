@@ -1,19 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-// Mock data for specialties and doctors
-const specialties = [
-  { id: 'cardiology', name: 'Cardiology' },
-  { id: 'dermatology', name: 'Dermatology' },
-  { id: 'neurology', name: 'Neurology' },
-];
-
+// Mock data for doctors
 const doctors = [
-  { id: 1, name: 'Dr. John Doe', specialty: 'cardiology' },
-  { id: 2, name: 'Dr. Jane Smith', specialty: 'dermatology' },
-  { id: 3, name: 'Dr. Sarah Connor', specialty: 'neurology' },
+  { id: 1, name: 'Dr. John Doe', specialty: 'Cardiology' },
+  { id: 2, name: 'Dr. Jane Smith', specialty: 'Dermatology' },
+  { id: 3, name: 'Dr. Sarah Connor', specialty: 'Neurology' },
 ];
 
-// Mock data for appointments
 const initialAppointments = [
   {
     id: 1,
@@ -24,37 +17,24 @@ const initialAppointments = [
   },
 ];
 
-const AppointmentList = () => {
+const AppointmentList = ({ preselectedDoctorId }) => {
   const [appointments, setAppointments] = useState(initialAppointments);
-  const [selectedSpecialty, setSelectedSpecialty] = useState('');
-  const [selectedDoctor, setSelectedDoctor] = useState('');
-  const [availableDoctors, setAvailableDoctors] = useState([]);
   const [formData, setFormData] = useState({
     date: '',
     time: '',
   });
 
-  // Filter doctors based on the selected specialty
-  useEffect(() => {
-    if (selectedSpecialty) {
-      const filteredDoctors = doctors.filter(
-        (doc) => doc.specialty === selectedSpecialty
-      );
-      setAvailableDoctors(filteredDoctors);
-      setSelectedDoctor('');
-    }
-  }, [selectedSpecialty]);
+  // Fetch the preselected doctor and their specialty
+  const preselectedDoctor = doctors.find((doc) => doc.id === preselectedDoctorId);
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle appointment booking
   const handleBookAppointment = () => {
-    if (!formData.date || !formData.time || !selectedDoctor) {
-      alert('Please fill all fields and select a doctor.');
+    if (!formData.date || !formData.time) {
+      alert('Please fill all fields.');
       return;
     }
 
@@ -63,16 +43,13 @@ const AppointmentList = () => {
       date: formData.date,
       time: formData.time,
       status: 'SCHEDULED',
-      doctor: selectedDoctor,
+      doctor: preselectedDoctor.name,
     };
 
     setAppointments([...appointments, newAppointment]);
     setFormData({ date: '', time: '' });
-    setSelectedDoctor('');
-    setSelectedSpecialty('');
   };
 
-  // Handle appointment deletion
   const handleDeleteAppointment = (id) => {
     setAppointments(appointments.filter((appointment) => appointment.id !== id));
   };
@@ -81,37 +58,23 @@ const AppointmentList = () => {
     <div>
       <h2>Your Appointments</h2>
 
-      {/* Booking Form */}
       <div className="appointment-form">
         <h3>Book an Appointment</h3>
         <div>
           <label>Specialty:</label>
-          <select
-            value={selectedSpecialty}
-            onChange={(e) => setSelectedSpecialty(e.target.value)}
-          >
-            <option value="">--Select Specialty--</option>
-            {specialties.map((spec) => (
-              <option key={spec.id} value={spec.id}>
-                {spec.name}
-              </option>
-            ))}
-          </select>
+          <input
+            type="text"
+            value={preselectedDoctor?.specialty || ''}
+            disabled
+          />
         </div>
         <div>
           <label>Doctor:</label>
-          <select
-            value={selectedDoctor}
-            onChange={(e) => setSelectedDoctor(e.target.value)}
-            disabled={!availableDoctors.length}
-          >
-            <option value="">--Select Doctor--</option>
-            {availableDoctors.map((doc) => (
-              <option key={doc.id} value={doc.name}>
-                {doc.name}
-              </option>
-            ))}
-          </select>
+          <input
+            type="text"
+            value={preselectedDoctor?.name || ''}
+            disabled
+          />
         </div>
         <div>
           <label>Date:</label>
@@ -134,7 +97,6 @@ const AppointmentList = () => {
         <button onClick={handleBookAppointment}>Book Appointment</button>
       </div>
 
-      {/* Appointment List */}
       <div className="appointment-list">
         <h3>Appointments</h3>
         <table>
@@ -158,7 +120,6 @@ const AppointmentList = () => {
                   <button onClick={() => handleDeleteAppointment(appointment.id)}>
                     Delete
                   </button>
-                  {/* Additional actions like Reschedule can be added */}
                 </td>
               </tr>
             ))}

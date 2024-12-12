@@ -2,6 +2,7 @@
   background: rgba(255, 255, 255, 0.95);
   color: var(--text-color);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   box-shadow: var(--shadow-sm);
   position: relative;
   top: 0;
@@ -10,7 +11,7 @@
   border-bottom: 1px solid var(--border-color);
 }
 
-.hero {
+.hero {  
   position: relative;
   min-height: 85vh;
   background: linear-gradient(135deg, var(--background-color) 0%, var(--surface-color) 100%);
@@ -62,4 +63,33 @@ h1.display-4 {
 
 p.lead {
   color: var(--text-color-light); /* Use a softer gray for the paragraph */
+}
+.create-appointment label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.create-appointment input {
+  margin-left: 10px;
+}
+
+.appointment-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.appointment-list li {
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
 }

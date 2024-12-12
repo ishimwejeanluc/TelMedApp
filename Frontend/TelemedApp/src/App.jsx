@@ -1,4 +1,5 @@
 // App.jsx
+import './app.css'
 import React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
@@ -8,7 +9,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <AppRoutes />  // Use the consolidated routes
+        <AppRoutes /> 
       </AuthProvider>
     </Router>
   )

@@ -1,7 +1,7 @@
 // AppRoutes.jsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';  // Corrected import path
+import { useAuth } from '../context/AuthContext';
 
 // Import all page components
 import Home from '../pages/Home';
@@ -11,6 +11,8 @@ import About from '../pages/About';
 import Contact from '../pages/Contact';
 import VerifyOtp from '../pages/VerifyOtp';
 import Dashboard from '../components/Dashboard/Dashboard';
+import Doctorboard from '../pages/Doctorboard';
+import DoctorsHome from '../pages/DoctorsHome';
 
 // NotFound Component
 const NotFound = () => (
@@ -27,7 +29,7 @@ const ProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Login />;
 };
 
-function AppRoutes() {
+const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
@@ -39,11 +41,15 @@ function AppRoutes() {
       <Route path="/contact" element={<Contact />} />
       <Route path="/verify-otp" element={<VerifyOtp />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/doctors" element={<DoctorsHome />} />
+      <Route path="/doctorboard" element={<Doctorboard />} />
+      
 
       {/* 404 Route - Always keep this as the last route */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
-}
+};
 
+// Single default export
 export default AppRoutes;
