@@ -43,6 +43,12 @@ function Navbar() {
               <Link className="nav-link" to="/login" style={{ color: 'var(--text-color)' }}>Login</Link>
             </li>
             <li className="nav-item">
+  <Link className="nav-link" to="/doctors" style={{ color: 'var(--text-color)' }}>
+    Doctors
+  </Link>
+</li>
+
+            <li className="nav-item">
               <Link 
                 className="nav-link btn text-white rounded-pill px-3" 
                 to="/register"
