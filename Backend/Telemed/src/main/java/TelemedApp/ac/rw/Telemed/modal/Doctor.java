@@ -1,18 +1,17 @@
 package TelemedApp.ac.rw.Telemed.modal;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
 public class Doctor {
     @Id
-    private UUID id = UUID.randomUUID();  // Generate a random UUID for each instance
+    private UUID id = UUID.randomUUID();
     private String name;
     private String specialization;
     private String email;
@@ -22,6 +21,7 @@ public class Doctor {
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonManagedReference("user-doctor")
     private User user;
 
     @ManyToMany
@@ -30,9 +30,11 @@ public class Doctor {
         joinColumns = @JoinColumn(name = "doctor_id"),
         inverseJoinColumns = @JoinColumn(name = "patient_id")
     )
+    @JsonIgnoreProperties("doctors")
     private Set<Patient> patients = new HashSet<>();
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)
+    @JsonManagedReference("doctor-appointments")
     private Set<Appointment> appointments = new HashSet<>();
 
     // Getters and Setters
@@ -104,24 +106,12 @@ public class Doctor {
         return patients;
     }
 
-    public List<Patient> getOrderedPatients() {
-        List<Patient> orderedList = new ArrayList<>(patients);
-        Collections.sort(orderedList, Comparator.comparing(Patient::getName));
-        return orderedList;
-    }
-
     public void setPatients(Set<Patient> patients) {
         this.patients = patients;
     }
 
     public Set<Appointment> getAppointments() {
         return appointments;
-    }
-
-    public List<Appointment> getOrderedAppointments() {
-        List<Appointment> orderedList = new ArrayList<>(appointments);
-        Collections.sort(orderedList, Comparator.comparing(Appointment::getDate).thenComparing(Appointment::getTime));
-        return orderedList;
     }
 
     public void setAppointments(Set<Appointment> appointments) {

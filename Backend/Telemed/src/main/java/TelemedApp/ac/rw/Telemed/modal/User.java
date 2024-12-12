@@ -1,5 +1,7 @@
 package TelemedApp.ac.rw.Telemed.modal;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import java.util.UUID;
 
@@ -11,6 +13,14 @@ public class User {
     private String password;
     private String role;
     private String email;
+
+    @OneToOne(mappedBy = "user")
+    @JsonBackReference("user-doctor")
+    private Doctor doctor;
+
+    @OneToOne(mappedBy = "user")
+    @JsonBackReference("user-patient")
+    private Patient patient;
 
     // Getters and Setters
     public UUID getId() {
@@ -51,5 +61,21 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
 }

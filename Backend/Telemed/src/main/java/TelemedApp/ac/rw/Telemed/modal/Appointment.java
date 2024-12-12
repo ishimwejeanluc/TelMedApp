@@ -1,7 +1,12 @@
 package TelemedApp.ac.rw.Telemed.modal;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Appointment {
@@ -12,14 +17,20 @@ public class Appointment {
 
     @ManyToOne
     @JoinColumn(name = "patient_id")
+    @JsonBackReference("patient-appointments")
     private Patient patient;
 
     @ManyToOne
     @JoinColumn(name = "doctor_id")
+    @JsonBackReference("doctor-appointments")
     private Doctor doctor;
 
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
+
+    @OneToMany(mappedBy = "appointment")
+    @JsonManagedReference("appointment-results")
+    private Set<TestResult> testResults = new HashSet<>();
 
     // Getters and Setters
     public UUID getId() {

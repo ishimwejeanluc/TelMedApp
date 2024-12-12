@@ -1,4 +1,7 @@
 package TelemedApp.ac.rw.Telemed.modal;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import java.util.UUID;
 
@@ -11,6 +14,7 @@ public class TestResult {
 
     @ManyToOne
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
+    @JsonBackReference("appointment-results")  // Add unique reference name
     private Appointment appointment;
 
     @Enumerated(EnumType.STRING)
@@ -56,5 +60,4 @@ public class TestResult {
     public void setStatus(TestResultStatus status) {
         this.status = status;
     }
- }
-
+}

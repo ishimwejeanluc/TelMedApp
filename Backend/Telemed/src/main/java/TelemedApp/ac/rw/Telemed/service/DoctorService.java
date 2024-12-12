@@ -36,4 +36,10 @@ public class DoctorService {
     public void deleteDoctor(UUID id) {
         doctorRepository.deleteById(id);
     }
+
+    public List<Doctor> getDoctorsBySpecialization(String specialization) {
+        return doctorRepository.findBySpecialization(specialization);
+    }
+    
+    
 }

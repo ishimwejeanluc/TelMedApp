@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import TelemedApp.ac.rw.Telemed.modal.User;
 import TelemedApp.ac.rw.Telemed.service.AuthenticationService;
 import TelemedApp.ac.rw.Telemed.service.TwoFactorAuthService;
+import TelemedApp.ac.rw.Telemed.service.PatientService;
+import TelemedApp.ac.rw.Telemed.modal.Patient;
 import jakarta.mail.MessagingException;
 
 import java.io.UnsupportedEncodingException;
@@ -24,10 +26,12 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
     private final TwoFactorAuthService twoFactorAuthService;
+    private final PatientService patientService;
 
-    public AuthenticationController(AuthenticationService authenticationService, TwoFactorAuthService twoFactorAuthService) {
+    public AuthenticationController(AuthenticationService authenticationService, TwoFactorAuthService twoFactorAuthService, PatientService patientService) {
         this.authenticationService = authenticationService;
         this.twoFactorAuthService = twoFactorAuthService;
+        this.patientService = patientService;
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -63,9 +67,26 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        // Retrieve user data and send as JSON
+        // Get user data
         User user = authenticationService.getUserByEmail(email);
-        response.put("user", user); // Assuming User has a proper toJSON method or similar
+        
+        // Create a map with only the user fields we want to send
+        Map<String, Object> userResponse = new HashMap<>();
+        userResponse.put("id", user.getId());
+        userResponse.put("username", user.getUsername());
+        userResponse.put("email", user.getEmail());
+        userResponse.put("role", user.getRole());
+        
+        // Get associated patient data if user is a patient
+        if (user.getRole().equals("PATIENT")) {
+            Patient patient = patientService.getPatientByUserId(user.getId());
+            if (patient != null) {
+                response.put("patient", patient);
+                response.put("patientId", patient.getId());
+            }
+        }
+
+        response.put("user", userResponse);
         response.put("message", "Login successful");
         return ResponseEntity.ok(response);
     }

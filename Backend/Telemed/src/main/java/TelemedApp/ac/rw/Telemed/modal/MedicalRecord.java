@@ -1,5 +1,7 @@
 package TelemedApp.ac.rw.Telemed.modal;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import java.util.UUID;
 import java.time.LocalDateTime;
@@ -15,10 +17,12 @@ public class MedicalRecord {
 
     @ManyToOne
     @JoinColumn(name = "patient_id")
+    @JsonBackReference("patient-records")
     private Patient patient;
 
     @ManyToOne
     @JoinColumn(name = "doctor_id")
+    @JsonBackReference("doctor-records")
     private Doctor doctor;
 
     @Enumerated(EnumType.STRING)

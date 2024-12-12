@@ -1,5 +1,7 @@
 package TelemedApp.ac.rw.Telemed.modal;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,13 +20,20 @@ public class Patient {
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonManagedReference("user-patient")
     private User user;
 
     @OneToMany(mappedBy = "patient")
+    @JsonManagedReference("patient-appointments")
     private Set<Appointment> appointments = new HashSet<>();
 
     @OneToMany(mappedBy = "patient")
+    @JsonManagedReference("patient-records")
     private Set<MedicalRecord> medicalRecords = new HashSet<>();
+
+    @ManyToMany(mappedBy = "patients")
+    @JsonIgnoreProperties("patients")
+    private Set<Doctor> doctors = new HashSet<>();
 
     // Getters and Setters
     public UUID getId() {
@@ -105,5 +114,13 @@ public class Patient {
 
     public void setMedicalRecords(Set<MedicalRecord> medicalRecords) {
         this.medicalRecords = medicalRecords;
+    }
+
+    public Set<Doctor> getDoctors() {
+        return doctors;
+    }
+
+    public void setDoctors(Set<Doctor> doctors) {
+        this.doctors = doctors;
     }
 }
