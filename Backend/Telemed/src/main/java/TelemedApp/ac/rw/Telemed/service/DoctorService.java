@@ -40,6 +40,10 @@ public class DoctorService {
     public List<Doctor> getDoctorsBySpecialization(String specialization) {
         return doctorRepository.findBySpecialization(specialization);
     }
+
+    public Doctor getDoctorByUserId(UUID userId) {
+        return doctorRepository.findByUser_Id(userId);
+    }
     
     
 }

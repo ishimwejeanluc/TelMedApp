@@ -17,6 +17,7 @@ public class SearchService {
     @Autowired
     private EntityManager entityManager;
 
+    @SuppressWarnings("CollectionsToArray")
     public List<Patient> searchPatients(String query) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Patient> cq = cb.createQuery(Patient.class);
@@ -36,6 +37,7 @@ public class SearchService {
         return entityManager.createQuery(cq).getResultList();
     }
 
+    @SuppressWarnings("CollectionsToArray")
     public List<Doctor> searchDoctors(String query) {
         try{CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Doctor> cq = cb.createQuery(Doctor.class);
@@ -56,6 +58,7 @@ public class SearchService {
         }
     }
 
+    @SuppressWarnings("CollectionsToArray")
     public List<MedicalRecord> searchMedicalRecords(String query) {
         try {
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -79,6 +82,7 @@ public class SearchService {
 
     }
 
+    @SuppressWarnings({"CollectionsToArray", "CollectionsToArray"})
     public List<Appointment> searchAppointments(String query) {
         try {
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();

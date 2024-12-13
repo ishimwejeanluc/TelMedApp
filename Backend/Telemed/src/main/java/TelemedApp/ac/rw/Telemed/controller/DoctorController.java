@@ -1,13 +1,18 @@
 package TelemedApp.ac.rw.Telemed.controller;
 
+import TelemedApp.ac.rw.Telemed.modal.Appointment;
 import TelemedApp.ac.rw.Telemed.modal.Doctor;
 import TelemedApp.ac.rw.Telemed.service.DoctorService;
+import TelemedApp.ac.rw.Telemed.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping(value = "/api/doctors")
@@ -16,6 +21,9 @@ public class DoctorController {
 
     @Autowired
     private DoctorService doctorService;
+
+    @Autowired
+    private AppointmentService appointmentService;
 
     @GetMapping
     public List<Doctor> getAllDoctors() {
@@ -74,6 +82,55 @@ public ResponseEntity<List<Doctor>> getDoctorsBySpecialization(@PathVariable Str
         return ResponseEntity.notFound().build();
     }
     return ResponseEntity.ok(doctors);
+}
+
+@GetMapping("/user/{userId}")
+public ResponseEntity<Doctor> getDoctorByUserId(@PathVariable UUID userId) {
+    try {
+        Doctor doctor = doctorService.getDoctorByUserId(userId);
+        if (doctor == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(doctor);
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().build();
+    }
+}
+
+@GetMapping("/user/{userId}/details")
+public ResponseEntity<?> getDoctorDetailsWithAppointments(@PathVariable UUID userId) {
+    try {
+        Doctor doctor = doctorService.getDoctorByUserId(userId);
+        if (doctor == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Create a response object with all needed information
+        Map<String, Object> response = new HashMap<>();
+        response.put("doctor", doctor);
+        
+        // Get today's appointments
+        List<Appointment> todayAppointments = appointmentService.getDoctorAppointmentsByDate(
+            doctor.getId(), 
+            LocalDate.now().toString()
+        );
+        response.put("todayAppointments", todayAppointments);
+
+        // Get upcoming appointments
+        List<Appointment> upcomingAppointments = appointmentService.getDoctorUpcomingAppointments(
+            doctor.getId()
+        );
+        response.put("upcomingAppointments", upcomingAppointments);
+
+        // Get total number of patients
+        int totalPatients = doctor.getPatients().size();
+        response.put("totalPatients", totalPatients);
+
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        return ResponseEntity.badRequest()
+            .body("Error fetching doctor details: " + e.getMessage());
+    }
 }
 }
 

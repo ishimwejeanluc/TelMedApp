@@ -22,7 +22,7 @@ public class MedicalRecord {
 
     @ManyToOne
     @JoinColumn(name = "doctor_id")
-    @JsonBackReference("doctor-records")
+    @JsonBackReference  // Prevent serialization of the doctor object in the MedicalRecord context
     private Doctor doctor;
 
     @Enumerated(EnumType.STRING)

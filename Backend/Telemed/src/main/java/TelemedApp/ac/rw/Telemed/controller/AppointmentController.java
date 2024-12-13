@@ -55,10 +55,33 @@ public class AppointmentController {
     }
 
     @GetMapping("/doctor/{doctorId}")
-    public List<Appointment> getAppointmentsByDoctor(@PathVariable UUID doctorId) {
-        Doctor doctor = new Doctor();
-        doctor.setId(doctorId);
-        return appointmentService.getAppointmentsByDoctor(doctor);
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByDoctor(@PathVariable UUID doctorId) {
+        Doctor doctor = doctorService.getDoctorById(doctorId);
+        if (doctor == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        List<Appointment> appointments = appointmentService.getAppointmentsByDoctor(doctor);
+        List<AppointmentDTO> appointmentDTOs = appointments.stream()
+                .map(AppointmentDTO::new)
+                .collect(Collectors.toList());
+                
+        return ResponseEntity.ok(appointmentDTOs);
+    }
+
+    @GetMapping("/doctor/user/{userId}")
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByDoctorUserId(@PathVariable UUID userId) {
+        Doctor doctor = doctorService.getDoctorByUserId(userId);
+        if (doctor == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        List<Appointment> appointments = appointmentService.getAppointmentsByDoctor(doctor);
+        List<AppointmentDTO> appointmentDTOs = appointments.stream()
+                .map(AppointmentDTO::new)
+                .collect(Collectors.toList());
+                
+        return ResponseEntity.ok(appointmentDTOs);
     }
 
     @GetMapping("/date/{date}")

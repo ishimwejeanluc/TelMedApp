@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
+import java.time.LocalDate;
 
 @Service
 public class AppointmentService {
@@ -41,5 +42,16 @@ public class AppointmentService {
 
     public void deleteAppointment(UUID id) {
         appointmentRepository.deleteById(id);
+    }
+
+    public List<Appointment> getDoctorAppointmentsByDate(UUID doctorId, String date) {
+        return appointmentRepository.findByDoctorIdAndDate(doctorId, date);
+    }
+
+    public List<Appointment> getDoctorUpcomingAppointments(UUID doctorId) {
+        return appointmentRepository.findByDoctorIdAndDateGreaterThanOrderByDateAsc(
+            doctorId, 
+            LocalDate.now().toString()
+        );
     }
 }
