@@ -1,14 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import styles from './AppointmentTable.module.css';
-
-// Mock data for appointments
-const appointmentsData = [
-  { id: 1, patientName: 'John Doe', time: '10:00 AM', status: 'Scheduled' },
-  { id: 2, patientName: 'Jane Smith', time: '11:00 AM', status: 'Scheduled' },
-  { id: 3, patientName: 'Sam Wilson', time: '12:00 PM', status: 'Completed' },
-  { id: 4, patientName: 'Mary Johnson', time: '2:00 PM', status: 'Scheduled' },
-  { id: 5, patientName: 'Robert Brown', time: '3:30 PM', status: 'Completed' },
-];
+import { getAuthHeader } from '../utils/auth';
 
 // Add these icons (you can use any icon library you prefer)
 const SearchIcon = () => (
@@ -38,28 +32,114 @@ const AssignIcon = () => (
 );
 
 const AppointmentTable = () => {
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  const [doctorData, setDoctorData] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [filters, setFilters] = useState({
+  const [searchQuery, setSearchQuery] = useState({
     patientName: '',
     time: '',
     status: ''
   });
   
-  const itemsPerPage = 5;
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
 
-  // Filter the data based on search inputs
-  const filteredItems = appointmentsData.filter(appointment => {
-    const nameMatch = appointment.patientName.toLowerCase().includes(filters.patientName.toLowerCase());
-    const timeMatch = appointment.time.toLowerCase().includes(filters.time.toLowerCase());
-    const statusMatch = appointment.status.toLowerCase().includes(filters.status.toLowerCase());
-    return nameMatch && timeMatch && statusMatch;
+    if (user?.role !== 'DOCTOR') {
+      navigate('/unauthorized');
+      return;
+    }
+
+    const fetchDoctorData = async () => {
+      try {
+        // First fetch doctor's details using the user ID
+        const doctorResponse = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/doctors/user/${user.id}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            }
+          }
+        );
+
+        if (!doctorResponse.ok) {
+          throw new Error('Failed to fetch doctor data');
+        }
+
+        const doctorDetails = await doctorResponse.json();
+        setDoctorData(doctorDetails);
+
+        // Then fetch appointments using the doctor_id
+        const appointmentsResponse = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/appointments/doctor/${doctorDetails.id}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            }
+          }
+        );
+
+        if (!appointmentsResponse.ok) {
+          throw new Error('Failed to fetch appointments');
+        }
+
+        const appointmentsData = await appointmentsResponse.json();
+        console.log('Appointments data:', appointmentsData);
+        
+        if (Array.isArray(appointmentsData)) {
+          const formattedAppointments = appointmentsData.map(apt => ({
+            id: apt.id,
+            date: apt.date,
+            time: apt.time,
+            patient: apt.patient?.name || 'Unknown Patient',
+            status: apt.status,
+          }));
+          setAppointments(formattedAppointments);
+        } else {
+          console.error('Unexpected appointments data structure:', appointmentsData);
+          setAppointments([]);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setAppointments([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctorData();
+  }, [isAuthenticated, user, navigate]);
+
+  const itemsPerPage = 1;
+
+  // Updated search functionality
+  const filteredAppointments = appointments.filter(appointment => {
+    if (!appointment) return false;
+
+    const patientNameMatch = appointment.patient?.toLowerCase().includes(searchQuery.patientName.toLowerCase());
+    const timeMatch = `${appointment.date} ${appointment.time}`.toLowerCase().includes(searchQuery.time.toLowerCase());
+    const statusMatch = searchQuery.status === '' || appointment.status === searchQuery.status;
+
+    return patientNameMatch && timeMatch && statusMatch;
   });
-  
-  // Calculate pagination
+
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const currentItems = filteredAppointments.slice(indexOfFirstItem, indexOfLastItem);
+
+  const currentItemNumber = filteredAppointments.length > 0 ? indexOfFirstItem + 1 : 0;
+  const totalItems = filteredAppointments.length;
 
   const handlePrevPage = () => {
     setCurrentPage(prev => Math.max(prev - 1, 1));
@@ -67,6 +147,14 @@ const AppointmentTable = () => {
 
   const handleNextPage = () => {
     setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
+
+  const handleSearch = (field, value) => {
+    setSearchQuery(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    setCurrentPage(1); // Reset to first page when search changes
   };
 
   const handleViewRecords = (id) => {
@@ -81,16 +169,19 @@ const AppointmentTable = () => {
     console.log(`Assigning results for patient ID: ${id}`);
   };
 
-  const handleFilterChange = (field, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    setCurrentPage(1); // Reset to first page when filter changes
-  };
+  if (loading) {
+    return <div className="loading-spinner">Loading appointments...</div>;
+  }
 
   return (
     <div className={styles.tableWrapper}>
+      {doctorData && (
+        <div className={styles.doctorInfo}>
+          <h2>Dr. {doctorData.name}</h2>
+          <p>Specialization: {doctorData.specialization}</p>
+        </div>
+      )}
+
       <table className={styles.table}>
         <thead>
           <tr>
@@ -101,9 +192,9 @@ const AppointmentTable = () => {
                   <SearchIcon />
                   <input
                     type="text"
-                    placeholder="Search name..."
-                    value={filters.patientName}
-                    onChange={(e) => handleFilterChange('patientName', e.target.value)}
+                    placeholder="Search patient..."
+                    value={searchQuery.patientName}
+                    onChange={(e) => handleSearch('patientName', e.target.value)}
                     className={styles.columnFilter}
                   />
                 </div>
@@ -112,26 +203,31 @@ const AppointmentTable = () => {
             <th>
               <div className={styles.columnHeader}>
                 <span>Time</span>
-                <input
-                  type="text"
-                  placeholder="Search time..."
-                  value={filters.time}
-                  onChange={(e) => handleFilterChange('time', e.target.value)}
-                  className={styles.columnFilter}
-                />
+                <div className={styles.inputWrapper}>
+                  <SearchIcon />
+                  <input
+                    type="text"
+                    placeholder="Search date/time..."
+                    value={searchQuery.time}
+                    onChange={(e) => handleSearch('time', e.target.value)}
+                    className={styles.columnFilter}
+                  />
+                </div>
               </div>
             </th>
             <th>
               <div className={styles.columnHeader}>
                 <span>Status</span>
                 <select
-                  value={filters.status}
-                  onChange={(e) => handleFilterChange('status', e.target.value)}
+                  value={searchQuery.status}
+                  onChange={(e) => handleSearch('status', e.target.value)}
                   className={styles.columnFilter}
                 >
                   <option value="">All</option>
-                  <option value="scheduled">Scheduled</option>
-                  <option value="completed">Completed</option>
+                  <option value="SCHEDULED">Scheduled</option>
+                  <option value="COMPLETED">Completed</option>
+                  <option value="CANCELLED">Cancelled</option>
+                  <option value="PENDING">Pending</option>
                 </select>
               </div>
             </th>
@@ -139,46 +235,56 @@ const AppointmentTable = () => {
           </tr>
         </thead>
         <tbody>
-          {currentItems.map((appointment) => (
-            <tr key={appointment.id}>
-              <td>{appointment.patientName}</td>
-              <td>{appointment.time}</td>
-              <td>
-                <span 
-                  className={`${styles.status} ${
-                    appointment.status.toLowerCase() === 'completed' 
-                      ? styles.completed 
-                      : styles.pending
-                  }`}
-                >
-                  {appointment.status}
-                </span>
-              </td>
-              <td className={styles.actionButtons}>
-                <button 
-                  className={`${styles.actionButton} ${styles.viewButton}`}
-                  onClick={() => handleViewRecords(appointment.id)}
-                >
-                  <ViewIcon />
-                  View Records
-                </button>
-                <button 
-                  className={`${styles.actionButton} ${styles.editButton}`}
-                  onClick={() => handleEdit(appointment.id)}
-                >
-                  <EditIcon />
-                  Edit
-                </button>
-                <button 
-                  className={`${styles.actionButton} ${styles.assignButton}`}
-                  onClick={() => handleAssignResults(appointment.id)}
-                >
-                  <AssignIcon />
-                  Assign Results
-                </button>
+          {currentItems.length > 0 ? (
+            currentItems.map((appointment) => (
+              <tr key={appointment.id}>
+                <td>{appointment.patient}</td>
+                <td>{`${appointment.date} ${appointment.time}`}</td>
+                <td>
+                  <span 
+                    className={`${styles.status} ${
+                      appointment.status === 'COMPLETED' 
+                        ? styles.completed 
+                        : appointment.status === 'SCHEDULED'
+                        ? styles.pending
+                        : styles.cancelled
+                    }`}
+                  >
+                    {appointment.status}
+                  </span>
+                </td>
+                <td className={styles.actionButtons}>
+                  <button 
+                    className={`${styles.actionButton} ${styles.viewButton}`}
+                    onClick={() => handleViewRecords(appointment.id)}
+                  >
+                    <ViewIcon />
+                    View Records
+                  </button>
+                  <button 
+                    className={`${styles.actionButton} ${styles.editButton}`}
+                    onClick={() => handleEdit(appointment.id)}
+                  >
+                    <EditIcon />
+                    Edit
+                  </button>
+                  <button 
+                    className={`${styles.actionButton} ${styles.assignButton}`}
+                    onClick={() => handleAssignResults(appointment.id)}
+                  >
+                    <AssignIcon />
+                    Assign Results
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4" className={styles.noData}>
+                No appointments found
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
       
@@ -191,7 +297,7 @@ const AppointmentTable = () => {
           ← Previous
         </button>
         <span className={styles.pageInfo}>
-          Page {currentPage} of {totalPages}
+          Appointment {currentItemNumber} of {totalItems}
         </span>
         <button 
           className={styles.paginationButton}

@@ -48,7 +48,7 @@ const VerifyOtp = () => {
       if (response.ok) {
         const success = await login(data);
         if (success) {
-          navigate('/patient/dashboard');
+          handleSuccess(data);
         } else {
           setError('Failed to process login data');
         }
@@ -96,6 +96,17 @@ const VerifyOtp = () => {
       setError('Failed to resend OTP. Please try again.');
     } finally {
       setIsResending(false);
+    }
+  };
+
+  const handleSuccess = async (data) => {
+    const success = await login(data);
+    if (success) {
+      if (data.user.role === 'DOCTOR') {
+        navigate('/doctor/dashboard');
+      } else if (data.user.role === 'PATIENT') {
+        navigate('/patient/dashboard');
+      }
     }
   };
 

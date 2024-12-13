@@ -10,7 +10,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <AppRoutes />  // Use the consolidated routes
+        <AppRoutes />  
       </AuthProvider>
       <ToastContainer position="top-right" autoClose={3000} />
     </Router>

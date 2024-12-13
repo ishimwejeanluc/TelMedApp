@@ -36,18 +36,59 @@ const AppointmentList = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  // Add check for authentication and patient info
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
     
+    // Only allow patients to access this component
+    if (user?.role !== 'PATIENT') {
+      navigate('/unauthorized');
+      return;
+    }
+
     if (!patientInfo) {
       showNotification('Patient information not found', 'error');
       return;
     }
-  }, [isAuthenticated, patientInfo, navigate]);
+
+    fetchPatientAppointments();
+  }, [isAuthenticated, user, patientInfo]);
+
+  // Add a function to fetch doctor's appointments
+  const fetchDoctorAppointments = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/appointments/doctor/${user.id}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch appointments');
+      }
+
+      const data = await response.json();
+      const formattedAppointments = data.map(apt => ({
+        id: apt.id,
+        date: apt.date,
+        time: apt.time,
+        patient: apt.patient?.name || 'Unknown Patient',
+        status: apt.status
+      }));
+
+      setAppointments(formattedAppointments);
+    } catch (error) {
+      console.error('Error fetching doctor appointments:', error);
+      showNotification('Failed to load appointments', 'error');
+    }
+  };
 
   // Update useEffect to fetch doctors from API when specialty changes
   useEffect(() => {
@@ -311,30 +352,35 @@ const AppointmentList = () => {
     setNotification({ message, type });
   };
 
-  useEffect(() => {
-    const loadPatientData = async () => {
-      try {
-        if (!patientInfo && user?.id) {
-          // If we don't have patient info but have user ID, fetch it
-          const response = await fetch(`http://localhost:8080/api/patients/user/${user.id}`);
-          if (response.ok) {
-            const data = await response.json();
-            console.log('Fetched patient data:', data);
-            // You'll need to add updatePatientInfo to your AuthContext
-            updatePatientInfo(data);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading patient data:', error);
-      }
-    };
+  const loadUserData = async () => {
+    try {
+      const endpoint = user?.role === 'DOCTOR' 
+        ? `/api/doctors/user/${user.id}`
+        : `/api/patients/user/${user.id}`;
 
-    loadPatientData();
-  }, [user?.id, patientInfo]);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}${endpoint}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load user data');
+      }
+
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    }
+  };
 
   return (
     <div>
-      {/* Add this near the top of your return statement */}
       {notification && (
         <Notification
           message={notification.message}
@@ -343,7 +389,6 @@ const AppointmentList = () => {
         />
       )}
 
-      {/* Add the confirmation modal */}
       <ConfirmationModal
         isOpen={confirmModal.isOpen}
         message="Are you sure you want to delete this appointment?"
@@ -351,64 +396,66 @@ const AppointmentList = () => {
         onCancel={() => setConfirmModal({ isOpen: false, appointmentId: null })}
       />
 
-      {/* Booking Form */}
-      <div className="appointments-pages-container">
-        <h3>{editingAppointment ? 'Update Appointment' : 'Book an Appointment'}</h3>
-        <div>
-          <label>Specialty:</label>
-          <select
-            value={selectedSpecialty}
-            onChange={(e) => setSelectedSpecialty(e.target.value)}
+      {/* Show booking form only for patients */}
+      {user?.role === 'PATIENT' && (
+        <div className="appointments-pages-container">
+          <h3>{editingAppointment ? 'Update Appointment' : 'Book an Appointment'}</h3>
+          <div>
+            <label>Specialty:</label>
+            <select
+              value={selectedSpecialty}
+              onChange={(e) => setSelectedSpecialty(e.target.value)}
+            >
+              <option value="">--Select Specialty--</option>
+              {specialties.map((spec) => (
+                <option key={spec.id} value={spec.id}>
+                  {spec.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label>Doctor:</label>
+            <select
+              value={selectedDoctor}
+              onChange={(e) => setSelectedDoctor(e.target.value)}
+              disabled={!availableDoctors.length}
+            >
+              <option value="">--Select Doctor--</option>
+              {availableDoctors.map((doc) => (
+                <option key={doc.id} value={doc.name}>
+                  {doc.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label>Date:</label>
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <label>Time:</label>
+            <input
+              type="time"
+              name="time"
+              value={formData.time}
+              onChange={handleInputChange}
+            />
+          </div>
+          <button 
+            onClick={editingAppointment ? handleUpdateAppointment : handleBookAppointment}
           >
-            <option value="">--Select Specialty--</option>
-            {specialties.map((spec) => (
-              <option key={spec.id} value={spec.id}>
-                {spec.name}
-              </option>
-            ))}
-          </select>
+            {editingAppointment ? 'Update Appointment' : 'Book Appointment'}
+          </button>
         </div>
-        <div>
-          <label>Doctor:</label>
-          <select
-            value={selectedDoctor}
-            onChange={(e) => setSelectedDoctor(e.target.value)}
-            disabled={!availableDoctors.length}
-          >
-            <option value="">--Select Doctor--</option>
-            {availableDoctors.map((doc) => (
-              <option key={doc.id} value={doc.name}>
-                {doc.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label>Date:</label>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
-          <label>Time:</label>
-          <input
-            type="time"
-            name="time"
-            value={formData.time}
-            onChange={handleInputChange}
-          />
-        </div>
-        <button 
-          onClick={editingAppointment ? handleUpdateAppointment : handleBookAppointment}
-        >
-          {editingAppointment ? 'Update Appointment' : 'Book Appointment'}
-        </button>
-      </div>
+      )}
 
-      {/* Appointment List */}
+      {/* Appointment List with different columns based on role */}
       <div className="appointment-list">
         <h3>Appointments</h3>
         <table>
@@ -416,7 +463,7 @@ const AppointmentList = () => {
             <tr>
               <th>Date</th>
               <th>Time</th>
-              <th>Doctor</th>
+              {user?.role === 'PATIENT' ? <th>Doctor</th> : <th>Patient</th>}
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -426,20 +473,36 @@ const AppointmentList = () => {
               <tr key={appointment.id}>
                 <td>{appointment.date}</td>
                 <td>{appointment.time}</td>
-                <td>{appointment.doctor}</td>
+                <td>
+                  {user?.role === 'PATIENT' 
+                    ? appointment.doctor 
+                    : appointment.patient}
+                </td>
                 <td>{appointment.status}</td>
                 <td className="action-buttons">
-                  <button 
-                    className="update-btn"
-                    onClick={() => setupAppointmentEdit(appointment)}
-                  >
-                    Update
-                  </button>
-                  <button 
-                    onClick={() => handleDeleteAppointment(appointment.id)}
-                  >
-                    Delete
-                  </button>
+                  {user?.role === 'PATIENT' && (
+                    <>
+                      <button 
+                        className="update-btn"
+                        onClick={() => setupAppointmentEdit(appointment)}
+                      >
+                        Update
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteAppointment(appointment.id)}
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
+                  {user?.role === 'DOCTOR' && (
+                    <button 
+                      className="view-btn"
+                      onClick={() => handleViewAppointment(appointment.id)}
+                    >
+                      View Details
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

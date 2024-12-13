@@ -11,7 +11,9 @@ import About from '../pages/About';
 import Contact from '../pages/Contact';
 import VerifyOtp from '../pages/VerifyOtp';
 import Dashboard from '../components/Dashboard/Dashboard';
-import Settings from '../components/Settings/Settings';
+import Doctorboard from '../pages/Doctorboard';
+import DoctorMedicalRecords from '../components/DoctorMedicalRecords/DoctorMedicalRecords';
+import DoctorTestResults from '../components/DoctorTestResults/DoctorTestResults';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
@@ -21,8 +23,9 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // If roles are specified, check if user has permission
-  if (allowedRoles.length > 0 && (!user?.role || !allowedRoles.includes(user.role))) {
+  const hasRequiredRole = allowedRoles.includes(user?.role);
+
+  if (allowedRoles.length > 0 && !hasRequiredRole) {
     return <Navigate to="/unauthorized" replace />;
   }
 
@@ -43,7 +46,6 @@ function AppRoutes() {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
-      <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/about" element={<About />} />
@@ -51,7 +53,33 @@ function AppRoutes() {
       <Route path="/verify-otp" element={<VerifyOtp />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* Protected Patient Routes */}
+      {/* Doctor Routes */}
+      <Route 
+        path="/doctor/dashboard" 
+        element={
+          <ProtectedRoute allowedRoles={['DOCTOR']}>
+            <Doctorboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/doctor/medical-records" 
+        element={
+          <ProtectedRoute allowedRoles={['DOCTOR']}>
+            <DoctorMedicalRecords />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/doctor/test-results" 
+        element={
+          <ProtectedRoute allowedRoles={['DOCTOR']}>
+            <DoctorTestResults />
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Patient Routes */}
       <Route 
         path="/patient/dashboard" 
         element={
@@ -61,38 +89,7 @@ function AppRoutes() {
         } 
       />
 
-      <Route 
-        path="/patient/settings" 
-        element={
-          <ProtectedRoute allowedRoles={['PATIENT']}>
-            <Settings />
-          </ProtectedRoute>
-        } 
-      />
-
-      {/* TODO: Implement these routes later */}
-      {/* Doctor and Admin routes are commented out until implemented */}
-      {/* 
-      <Route 
-        path="/doctor/dashboard" 
-        element={
-          <ProtectedRoute allowedRoles={['DOCTOR']}>
-            <DoctorDashboard />
-          </ProtectedRoute>
-        } 
-      />
-
-      <Route 
-        path="/admin/dashboard" 
-        element={
-          <ProtectedRoute allowedRoles={['ADMIN']}>
-            <AdminDashboard />
-          </ProtectedRoute>
-        } 
-      /> 
-      */}
-
-      {/* 404 Route - Always keep this as the last route */}
+      {/* 404 Route */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

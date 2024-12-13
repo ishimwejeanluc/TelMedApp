@@ -1,30 +1,57 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [patientInfo, setPatientInfo] = useState(null);
+  const [doctorInfo, setDoctorInfo] = useState(null);
+
+  // Load stored data on mount
+  useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      const storedPatientInfo = localStorage.getItem('patientInfo');
+      const storedDoctorInfo = localStorage.getItem('doctorInfo');
+
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+      }
+
+      if (storedPatientInfo) {
+        const parsedPatientInfo = JSON.parse(storedPatientInfo);
+        setPatientInfo(parsedPatientInfo);
+      }
+
+      if (storedDoctorInfo) {
+        const parsedDoctorInfo = JSON.parse(storedDoctorInfo);
+        setDoctorInfo(parsedDoctorInfo);
+      }
+    } catch (error) {
+      console.error('Error loading stored data:', error);
+      localStorage.removeItem('user');
+      localStorage.removeItem('patientInfo');
+      localStorage.removeItem('doctorInfo');
+    }
+  }, []);
 
   const login = async (data) => {
     try {
       console.log('Login data received:', data);
-
-      // Store user data
+      
       setUser(data.user);
       setIsAuthenticated(true);
+      localStorage.setItem('user', JSON.stringify(data.user));
 
-      // If patient data is included in the response, store it directly
-      if (data.patient) {
-        console.log('Setting patient info:', data.patient);
+      if (data.user?.role === 'PATIENT' && data.patient) {
         setPatientInfo(data.patient);
-      } else {
-        console.log('No patient data found in response. Full response:', data);
-        // Try to get patient info using user ID
-        if (data.user?.id) {
-          await fetchPatientInfo(data.user.id);
-        }
+        localStorage.setItem('patientInfo', JSON.stringify(data.patient));
+      } else if (data.user?.role === 'DOCTOR' && data.doctor) {
+        setDoctorInfo(data.doctor);
+        localStorage.setItem('doctorInfo', JSON.stringify(data.doctor));
       }
 
       return true;
@@ -34,43 +61,55 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const fetchPatientInfo = async (userId) => {
+  const logout = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/patients/user/${userId}`);
-      if (!response.ok) throw new Error('Failed to fetch patient info');
+      // Clear the token from localStorage
+      localStorage.removeItem('token');
+      
+      // Clear any other auth-related data
+      setUser(null);
+      setIsAuthenticated(false);
 
-      const patientData = await response.json();
-      console.log('Fetched patient data:', patientData);
-      setPatientInfo(patientData);
+      // Optional: Call your backend logout endpoint
+      await fetch(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
     } catch (error) {
-      console.error('Error fetching patient info:', error);
+      console.error('Logout error:', error);
+      // Still clear local data even if server logout fails
+      localStorage.removeItem('token');
+      setUser(null);
+      setIsAuthenticated(false);
     }
   };
 
-  const updatePatientInfo = (newInfo) => {
-    setPatientInfo(newInfo);
-  };
-
-  const logout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
-    setPatientInfo(null);
-    // Navigate to home page after logout
-    window.location.href = '/';
+  const value = {
+    isAuthenticated,
+    user,
+    patientInfo,
+    doctorInfo,
+    login,
+    logout
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      isAuthenticated, 
-      user, 
-      patientInfo,
-      login, 
-      logout,
-      updatePatientInfo 
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+export { AuthProvider, useAuth };
