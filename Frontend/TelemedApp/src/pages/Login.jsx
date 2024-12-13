@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
-  const { login, user } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,22 +30,6 @@ const Login = () => {
     } catch (error) {
       console.error('Error logging in:', error);
       alert('An error occurred. Please try again later.');
-    }
-  };
-
-  const handleLogin = async (credentials) => {
-    const success = await login(credentials);
-    if (success) {
-      // For now, only handle patient role
-      if (user.role === 'PATIENT') {
-        navigate('/patient/dashboard');
-      } else {
-        // Temporary handling for other roles
-        showNotification('This user type is not yet supported', 'info');
-        navigate('/');
-      }
-    } else {
-      // Show error message
     }
   };
 

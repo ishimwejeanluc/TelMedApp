@@ -1,164 +1,118 @@
-import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import './VerifyOtp.css';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const VerifyOtp = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [otp, setOtp] = useState('');
-  const [timer, setTimer] = useState(30);
-  const [isResending, setIsResending] = useState(false);
-  const [error, setError] = useState('');
-  const { login } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { login } = useAuth();
+    const [otp, setOtp] = useState('');
+    const [email, setEmail] = useState('');
+    const [timer, setTimer] = useState(300); // 5 minutes in seconds
 
-  const handleInputChange = (e) => {
-    const value = e.target.value.replace(/\s/g, '');
-    setOtp(value);
-    setError('');
-  };
-
-  const handleVerify = async () => {
-    if (otp.length !== 8) {
-      setError('Please enter all 8 characters');
-      return;
-    }
-
-    console.log('Attempting to verify OTP:', {
-      email: location.state?.email,
-      otp: otp
-    });
-
-    try {
-      const response = await fetch('http://localhost:8080/api/auth/verify-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: location.state?.email,
-          otp: otp
-        })
-      });
-
-      const data = await response.json();
-      console.log('OTP verification response:', data);
-
-      if (response.ok) {
-        const success = await login(data);
-        if (success) {
-          handleSuccess(data);
-        } else {
-          setError('Failed to process login data');
+    useEffect(() => {
+        if (location.state && location.state.email) {
+            setEmail(location.state.email);
         }
-      } else {
-        console.error('OTP verification failed:', data);
-        setError(data.error || 'Invalid OTP. Please try again.');
-      }
-    } catch (error) {
-      console.error('Verification error:', error);
-      setError('Verification failed. Please try again.');
-    }
-  };
+    }, [location.state]);
 
-  const handleResendOtp = async () => {
-    if (timer > 0) return;
-    
-    console.log('Attempting to resend OTP for email:', location.state?.email);
-    setIsResending(true);
-    try {
-      const response = await fetch('http://localhost:8080/api/auth/resend-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: location.state?.email
-        })
-      });
+    useEffect(() => {
+        const countdown = setInterval(() => {
+            setTimer((prevTimer) => {
+                if (prevTimer <= 0) {
+                    clearInterval(countdown);
+                    return 0;
+                }
+                return prevTimer - 1;
+            });
+        }, 1000);
 
-      const data = await response.json();
-      console.log('Resend OTP response:', data);
+        return () => clearInterval(countdown);
+    }, []);
 
-      if (response.ok) {
-        setTimer(30);
-        setOtp('');
-        if (data.message) {
-          setError('');
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/verify-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, otp }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const userRole = data.user.role;
+
+                if (userRole === 'PATIENT') {
+                    login(data.user.id);
+                    navigate('/patient-dashboard');
+                } else {
+                    navigate('/default-dashboard');
+                }
+            } else {
+                alert('Invalid OTP. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error verifying OTP:', error);
+            alert('An error occurred. Please try again later.');
         }
-      } else {
-        console.error('Failed to resend OTP:', data);
-        setError(data.error || 'Failed to resend OTP. Please try again.');
-      }
-    } catch (error) {
-      console.error('Resend error:', error);
-      setError('Failed to resend OTP. Please try again.');
-    } finally {
-      setIsResending(false);
-    }
-  };
+    };
 
-  const handleSuccess = async (data) => {
-    const success = await login(data);
-    if (success) {
-      if (data.user.role === 'DOCTOR') {
-        navigate('/doctor/dashboard');
-      } else if (data.user.role === 'PATIENT') {
-        navigate('/patient/dashboard');
-      }
-    }
-  };
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    };
 
-  return (
-    <div className="verify-otp-page">
-      <Navbar />
-      <div className="verify-otp-container">
-        <div className="verify-otp-card">
-          <div className="verify-otp-header">
-            <h2>Verify Your Email</h2>
-            <p>
-              We've sent a verification code to<br />
-              <strong>{location.state?.email}</strong>
-            </p>
-          </div>
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+                <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold text-gray-800 mb-2">Verify Your OTP</h2>
+                    <p className="text-gray-600">Enter the verification code sent to</p>
+                    <p className="text-blue-600 font-medium">{email}</p>
+                </div>
 
-          <div className="otp-input-container">
-            <input
-              type="text"
-              value={otp}
-              onChange={handleInputChange}
-              placeholder="Enter verification code"
-              maxLength={8}
-              className={error ? 'error' : ''}
-              autoComplete="off"
-            />
-          </div>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                            <label className="text-sm font-medium text-gray-700">OTP Code</label>
+                            <span className="text-sm text-gray-500">Time remaining: {formatTime(timer)}</span>
+                        </div>
+                        <input
+                            type="text"
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors text-center text-xl tracking-wide"
+                            placeholder="Enter OTP"
+                            required
+                        />
+                    </div>
 
-          {error && <div className="error-message">{error}</div>}
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold"
+                    >
+                        Verify OTP
+                    </button>
+                </form>
 
-          <button 
-            className="verify-button"
-            onClick={handleVerify}
-            disabled={otp.length !== 8}
-          >
-            Verify Email
-          </button>
-
-          <div className="resend-section">
-            <button
-              className="resend-button"
-              onClick={handleResendOtp}
-              disabled={timer > 0 || isResending}
-            >
-              {isResending ? 'Resending...' : 'Resend Code'}
-              {timer > 0 && ` (${timer}s)`}
-            </button>
-          </div>
+                <div className="mt-6 text-center">
+                    <p className="text-sm text-gray-600">
+                        Didn't receive the code?{' '}
+                        <button
+                            className="text-blue-600 hover:text-blue-700 font-medium"
+                            onClick={() => setTimer(300)}
+                        >
+                            Resend OTP
+                        </button>
+                    </p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default VerifyOtp;

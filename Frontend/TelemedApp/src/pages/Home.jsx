@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar';
 
 function Home() {
   const features = [
@@ -23,7 +22,6 @@ function Home() {
 
   return (
     <div className="home-page full-page">
-      <Navbar />
       
       {/* Hero Section */}
       <section className="hero-section">

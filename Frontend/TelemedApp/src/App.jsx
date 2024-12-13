@@ -1,19 +1,21 @@
 // App.jsx
+import './app.css'
 import React from 'react'
-import { BrowserRouter as Router } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import AppRoutes from './routes/AppRoutes'  // Import the routes from AppRoutes
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Navbar from './components/Navbar'
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <AppRoutes />  
-      </AuthProvider>
-      <ToastContainer position="top-right" autoClose={3000} />
-    </Router>
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="app">
+          <Navbar />
+          <AppRoutes />
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 

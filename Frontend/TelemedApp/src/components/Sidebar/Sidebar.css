@@ -13,7 +13,7 @@
   flex-direction: column;
   padding: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  position: fixed;
+  position: sticky;
   top: 0;
   height: 100vh;
   overflow-y: auto;
@@ -57,13 +57,11 @@
 /* Content Area Styling */
 .content {
   flex: 1;
-  margin-left: 250px; /* Add this to offset the fixed sidebar */
   padding: 30px;
   background-color: #f4f6f7;
-  min-height: 100vh;
-  overflow-y: visible;
+  overflow-y: auto;
+  max-height: 100vh;
 }
-
 
 .content h1 {
   font-size: 2rem;
@@ -176,3 +174,69 @@ input:focus, select:focus {
   background-color: #c0392b;
 }
 
+/* Appointment Table */
+.appointment-table {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-table th {
+  background-color: #3498db;
+  color: white;
+  padding: 15px;
+  text-align: left;
+}
+
+.appointment-table td {
+  padding: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.appointment-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status Indicators */
+.status {
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.status.scheduled {
+  background-color: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
+}
+
+.status.completed {
+  background-color: rgba(52, 152, 219, 0.1);
+  color: #3498db;
+}
+
+.status.cancelled {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+  }
+
+  .content {
+    max-height: none;
+  }
+
+  .cards-container {
+    grid-template-columns: 1fr;
+  }
+}

@@ -35,3 +35,250 @@ main {
   font-size: 1.5em;
   color: var(--text-color);
 }
+.doctor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.doctor-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.doctor-card h3 {
+  margin-bottom: 8px;
+  color: #007bff;
+}
+
+.doctor-card p {
+  margin-bottom: 12px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+/* Flexbox Layout for Dashboard */
+.dashboard-content {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+/* Cards Section Styling */
+.cards-section {
+  flex: 1;
+  max-width: 30%;
+}
+
+/* Table Section Styling */
+.table-section {
+  flex: 2;
+  max-width: 65%;
+}
+
+/* Cards Styling */
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.card {
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #007bff;
+  margin: 0;
+}
+
+/* Table Section Styling */
+.appointment-table {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-table table {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+.appointment-table th,
+.appointment-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.appointment-table th {
+  background-color: #f8f9fa;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #555;
+}
+
+.appointment-table td {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.appointment-table tbody tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .cards-section {
+    max-width: 80%;
+  }
+
+  .table-section {
+    max-width: 80%;
+  }
+}
+/* Dashboard Container */
+.dashboard-container {
+  display: flex;
+  height: 100vh; /* Full height of the viewport */
+  background-color: #f8f9fa; /* Light gray background for contrast */
+  color: #343a40; /* Dark gray text for readability */
+  font-family: 'Arial', sans-serif; /* Clean and professional font */
+}
+
+/* Sidebar Styling */
+.sidebar {
+  flex: 1;
+  max-width: 250px;
+  background-color: #007bff; /* Blue background for sidebar */
+  color: #fff; /* White text for sidebar items */
+  padding: 20px;
+  height: 100%;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar a {
+  display: block;
+  color: #f8f9fa;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 15px 0;
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.sidebar a:hover {
+  color: #ffc107; /* Yellow hover effect */
+  transform: translateX(5px); /* Slight animation for engagement */
+}
+
+.sidebar a.active {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+/* Content Area Styling */
+.content {
+  flex: 3;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.content h1 {
+  font-size: 2rem;
+  color: #007bff; /* Blue for headings */
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.content p {
+  font-size: 1.1rem; /* Slightly larger text for paragraphs */
+  color: #495057; /* Medium gray text */
+  line-height: 1.6; /* Increased line height for readability */
+}
+
+.text-muted {
+  color: #6c757d; /* Muted gray for secondary text */
+}
+
+/* Buttons */
+button {
+  padding: 10px 15px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    flex: 0;
+    max-width: 100%;
+    box-shadow: none;
+  }
+
+  .content {
+    flex: 1;
+    padding: 15px;
+  }
+
+  .content h1 {
+    font-size: 1.5rem;
+  }
+
+  .content p {
+    font-size: 1rem;
+  }
+}
