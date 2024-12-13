@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/api/appointments", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value ="/api/appointments", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin
 public class AppointmentController {
 
@@ -149,4 +149,25 @@ public class AppointmentController {
         appointmentService.deleteAppointment(id);
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/doctor/{doctorId}/scheduled-patients")
+  public ResponseEntity<List<Patient>> getScheduledPatientsByDoctor(@PathVariable UUID doctorId) {
+    try {
+        Doctor doctor = doctorService.getDoctorById(doctorId);
+        if (doctor == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Get all appointments for the doctor with SCHEDULED status
+        List<Patient> scheduledPatients = appointmentService.getAppointmentsByDoctor(doctor)
+            .stream()
+            .filter(appointment -> appointment.getStatus() == AppointmentStatus.SCHEDULED)
+            .map(Appointment::getPatient)
+            .distinct()  
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(scheduledPatients);
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().build();
+    }
+}
 }

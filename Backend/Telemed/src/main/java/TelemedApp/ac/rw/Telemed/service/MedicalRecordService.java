@@ -1,5 +1,6 @@
 package TelemedApp.ac.rw.Telemed.service;
 
+import TelemedApp.ac.rw.Telemed.modal.Doctor;
 import TelemedApp.ac.rw.Telemed.modal.MedicalRecord;
 import TelemedApp.ac.rw.Telemed.modal.Patient;
 import TelemedApp.ac.rw.Telemed.repository.MedicalRecordRepository;
@@ -32,5 +33,9 @@ public class MedicalRecordService {
 
     public void deleteMedicalRecord(UUID id) {
         medicalRecordRepository.deleteById(id);
+    }
+
+    public List<MedicalRecord> getMedicalRecordsByDoctor(Doctor doctor) {
+        return medicalRecordRepository.findByDoctor(doctor);
     }
 }

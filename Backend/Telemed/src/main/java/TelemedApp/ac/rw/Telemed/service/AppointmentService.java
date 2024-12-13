@@ -1,6 +1,7 @@
 package TelemedApp.ac.rw.Telemed.service;
 
 import TelemedApp.ac.rw.Telemed.modal.Appointment;
+import TelemedApp.ac.rw.Telemed.modal.AppointmentStatus;
 import TelemedApp.ac.rw.Telemed.modal.Doctor;
 import TelemedApp.ac.rw.Telemed.modal.Patient;
 import TelemedApp.ac.rw.Telemed.repository.AppointmentRepository;
@@ -54,4 +55,11 @@ public class AppointmentService {
             LocalDate.now().toString()
         );
     }
+
+
+    public List<Appointment> getAppointmentsByDoctorAndStatus(Doctor doctor, AppointmentStatus status) {
+        return appointmentRepository.findByDoctorAndStatus(doctor, status);
+    }
+
+
 }
