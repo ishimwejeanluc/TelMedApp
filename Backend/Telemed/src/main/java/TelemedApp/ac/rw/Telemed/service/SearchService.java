@@ -111,8 +111,8 @@ public class SearchService {
         SearchResult result = new SearchResult();
         result.setPatients(searchPatients(query));
         result.setDoctors(searchDoctors(query));
-        // result.setMedicalRecords(searchMedicalRecords(query));
-        // result.setAppointments(searchAppointments(query));
+        result.setMedicalRecords(searchMedicalRecords(query));
+        result.setAppointments(searchAppointments(query));
         return result;
     }
 }

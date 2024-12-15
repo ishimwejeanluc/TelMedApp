@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping(value ="/api/appointments", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -31,8 +33,22 @@ public class AppointmentController {
     private DoctorService doctorService;
 
     @GetMapping
-    public List<Appointment> getAllAppointments() {
-        return appointmentService.getAllAppointments();
+    public ResponseEntity<List<Map<String, Object>>> getAllAppointments() {
+        List<Appointment> appointments = appointmentService.getAllAppointments();
+        List<Map<String, Object>> response = appointments.stream()
+            .map(appointment -> {
+                Map<String, Object> appointmentMap = new HashMap<>();
+                appointmentMap.put("id", appointment.getId());
+                appointmentMap.put("date", appointment.getDate());
+                appointmentMap.put("time", appointment.getTime());
+                appointmentMap.put("status", appointment.getStatus());
+                appointmentMap.put("doctor", appointment.getDoctor());
+                appointmentMap.put("patient", appointment.getPatient());
+                return appointmentMap;
+            })
+            .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
@@ -115,7 +131,7 @@ public class AppointmentController {
             // Create and populate the appointment
             Appointment appointment = new Appointment();
             appointment.setDate(appointmentRequest.getDate());
-            appointment.setTime(appointmentRequest.getTime());
+            appointment.setTime(appointmentRequest.getTime());    
             appointment.setPatient(patient);
             appointment.setDoctor(doctor);
             appointment.setStatus(AppointmentStatus.SCHEDULED);

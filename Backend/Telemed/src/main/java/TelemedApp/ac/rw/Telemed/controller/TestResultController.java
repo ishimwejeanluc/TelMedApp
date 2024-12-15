@@ -2,14 +2,16 @@ package TelemedApp.ac.rw.Telemed.controller;
 
 import TelemedApp.ac.rw.Telemed.modal.TestResult;
 import TelemedApp.ac.rw.Telemed.service.TestResultService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/test-results")
+@RequestMapping(value = "/api/test-results", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin
 public class TestResultController {
 
@@ -27,7 +29,7 @@ public class TestResultController {
         return testResult != null ? ResponseEntity.ok(testResult) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping
+    @PostMapping(value = "/saveTestResult", consumes = MediaType.APPLICATION_JSON_VALUE)
     public TestResult createTestResult(@RequestBody TestResult testResult) {
         return testResultService.saveTestResult(testResult);
     }

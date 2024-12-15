@@ -2,8 +2,7 @@ package TelemedApp.ac.rw.Telemed.controller;
 
 import TelemedApp.ac.rw.Telemed.modal.User;
 import TelemedApp.ac.rw.Telemed.service.UserService;
-
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +18,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping
     public List<User> getAllUsers() {
@@ -45,14 +47,29 @@ public class UserController {
 
     @PostMapping(value = "/saveUser", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) {
-    User savedUser = userService.saveUser(user);
+        try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            
+            User savedUser = userService.saveUser(user);
 
-    if (savedUser != null) {
-        return ResponseEntity.ok(Map.of("message", "User created successfully", "user", savedUser));
-    } else {
-        return ResponseEntity.badRequest().body(Map.of("error", "User already exists"));
+            if (savedUser != null) {
+                savedUser.setPassword(null);
+                return ResponseEntity.ok(Map.of(
+                    "message", "User created successfully", 
+                    "user", savedUser
+                ));
+            } else {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "error", "User already exists"
+                ));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "error", "Error creating user: " + e.getMessage()
+            ));
+        }
     }
-}
+
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable UUID id, @RequestBody User user) {
         User existingUser = userService.getUserById(id);

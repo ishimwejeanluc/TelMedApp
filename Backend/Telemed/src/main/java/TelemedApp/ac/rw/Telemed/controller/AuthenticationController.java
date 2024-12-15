@@ -41,18 +41,30 @@ public class AuthenticationController {
         String email = request.get("email");
         String password = request.get("password");
 
-        User user = authenticationService.getUserByEmail(email);
-        if (user == null || !authenticationService.checkPassword(user, password)) {
-            response.put("error", "Invalid email or password");
+        // Validate input
+        if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+            response.put("error", "Email and password are required");
             return ResponseEntity.badRequest().body(response);
         }
 
-        // Generate and send OTP
-        String otp = twoFactorAuthService.generateOTP(email);
-        twoFactorAuthService.sendOtpEmail(email, otp);
+        try {
+            User user = authenticationService.getUserByEmail(email);
+            if (user == null || !authenticationService.checkPassword(user, password)) {
+                response.put("error", "Invalid email or password");
+                return ResponseEntity.badRequest().body(response);
+            }
 
-        response.put("message", "OTP sent to your email");
-        return ResponseEntity.ok(response);
+            // Generate and send OTP
+            String otp = twoFactorAuthService.generateOTP(email);
+            twoFactorAuthService.sendOtpEmail(email, otp);
+
+            response.put("message", "OTP sent to your email");
+            response.put("email", email); // Include email in response for OTP verification
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("error", "An error occurred during login: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @PostMapping(value = "/verify-otp", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -62,33 +74,48 @@ public class AuthenticationController {
         String email = request.get("email");
         String otp = request.get("otp");
 
-        if (!twoFactorAuthService.verifyOTP(email, otp)) {
-            response.put("error", "Invalid OTP");
+        // Validate input
+        if (email == null || email.trim().isEmpty() || otp == null || otp.trim().isEmpty()) {
+            response.put("error", "Email and OTP are required");
             return ResponseEntity.badRequest().body(response);
         }
 
-        // Get user data
-        User user = authenticationService.getUserByEmail(email);
-        
-        // Create a map with only the user fields we want to send
-        Map<String, Object> userResponse = new HashMap<>();
-        userResponse.put("id", user.getId());
-        userResponse.put("username", user.getUsername());
-        userResponse.put("email", user.getEmail());
-        userResponse.put("role", user.getRole());
-        
-        // Get associated patient data if user is a patient
-        if (user.getRole().equals("PATIENT")) {
-            Patient patient = patientService.getPatientByUserId(user.getId());
-            if (patient != null) {
-                response.put("patient", patient);
-                response.put("patientId", patient.getId());
+        try {
+            if (!twoFactorAuthService.verifyOTP(email, otp)) {
+                response.put("error", "Invalid or expired OTP");
+                return ResponseEntity.badRequest().body(response);
             }
-        }
 
-        response.put("user", userResponse);
-        response.put("message", "Login successful");
-        return ResponseEntity.ok(response);
+            // Get user data
+            User user = authenticationService.getUserByEmail(email);
+            if (user == null) {
+                response.put("error", "User not found");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Create a map with only the user fields we want to send
+            Map<String, Object> userResponse = new HashMap<>();
+            userResponse.put("id", user.getId());
+            userResponse.put("username", user.getUsername());
+            userResponse.put("email", user.getEmail());
+            userResponse.put("role", user.getRole());
+            
+            // Get associated patient data if user is a patient
+            if ("PATIENT".equals(user.getRole())) {
+                Patient patient = patientService.getPatientByUserId(user.getId());
+                if (patient != null) {
+                    response.put("patient", patient);
+                    response.put("patientId", patient.getId());
+                }
+            }
+
+            response.put("user", userResponse);
+            response.put("message", "Login successful");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("error", "An error occurred during OTP verification: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @PostMapping(value = "/request-otp", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

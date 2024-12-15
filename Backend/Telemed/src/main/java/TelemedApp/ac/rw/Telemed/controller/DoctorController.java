@@ -5,6 +5,7 @@ import TelemedApp.ac.rw.Telemed.modal.Doctor;
 import TelemedApp.ac.rw.Telemed.service.DoctorService;
 import TelemedApp.ac.rw.Telemed.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ import java.util.Map;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping(value = "/api/doctors")
+@RequestMapping(value = "/api/doctors", produces = MediaType.APPLICATION_JSON_VALUE )
 @CrossOrigin
 public class DoctorController {
 
@@ -67,13 +68,22 @@ public class DoctorController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDoctor(@PathVariable UUID id) {
-        Doctor existingDoctor = doctorService.getDoctorById(id);
-        if (existingDoctor == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<Map<String, Object>> deleteDoctor(@PathVariable UUID id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Doctor doctor = doctorService.getDoctorById(id);
+            if (doctor == null) {
+                response.put("error", "Doctor not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+
+            doctorService.deleteDoctor(id);
+            response.put("message", "Doctor and associated user deleted successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("error", "Failed to delete doctor: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        doctorService.deleteDoctor(id);
-        return ResponseEntity.ok().build();
     }
     @GetMapping("/specialization/{specialization}")
 public ResponseEntity<List<Doctor>> getDoctorsBySpecialization(@PathVariable String specialization) {

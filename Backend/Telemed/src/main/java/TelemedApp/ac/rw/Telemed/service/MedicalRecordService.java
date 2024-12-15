@@ -38,4 +38,8 @@ public class MedicalRecordService {
     public List<MedicalRecord> getMedicalRecordsByDoctor(Doctor doctor) {
         return medicalRecordRepository.findByDoctor(doctor);
     }
+
+    public List<MedicalRecord> getMedicalRecordsByPatientId(UUID patientId) {
+        return medicalRecordRepository.findByPatientId(patientId);
+    }
 }

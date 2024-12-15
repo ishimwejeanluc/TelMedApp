@@ -2,8 +2,10 @@ package TelemedApp.ac.rw.Telemed.controller;
 
 import TelemedApp.ac.rw.Telemed.modal.SearchResult;
 import TelemedApp.ac.rw.Telemed.service.SearchService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/api/search")
@@ -13,7 +15,7 @@ public class SearchController {
     @Autowired
     private SearchService searchService;
 
-    @GetMapping
+    @GetMapping(value = "/globalSearch", produces = MediaType.APPLICATION_JSON_VALUE)
     public SearchResult globalSearch(@RequestParam String query) {
         return searchService.globalSearch(query);
     }
