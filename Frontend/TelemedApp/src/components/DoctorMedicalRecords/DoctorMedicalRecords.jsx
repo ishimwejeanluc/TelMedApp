@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import '../../styles/dashboard.css';
+import './DoctorMedicalRecords.module.css';
+import { FaPlus } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import styles from './DoctorMedicalRecords.module.css';
+import Notification from '../Notification/Notification';
 
-const MedicalRecords = () => {
+const DoctorMedicalRecords = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const [doctorData, setDoctorData] = useState(null);
@@ -11,13 +14,34 @@ const MedicalRecords = () => {
   const [selectedPatient, setSelectedPatient] = useState('');
   const [medicalRecords, setMedicalRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [newRecord, setNewRecord] = useState({
     condition: '',
     diagnosis: '',
     treatment: '',
     notes: ''
   });
+  const [notification, setNotification] = useState({
+    message: '',
+    type: '',
+    show: false
+  });
+
+  // Add notification handlers
+  const showNotification = (message, type) => {
+    setNotification({
+      message,
+      type,
+      show: true
+    });
+  };
+
+  const closeNotification = () => {
+    setNotification({
+      message: '',
+      type: '',
+      show: false
+    });
+  };
 
   // First, fetch doctor details and then get their appointments
   useEffect(() => {
@@ -81,7 +105,7 @@ const MedicalRecords = () => {
         setPatients(formattedPatients);
       } catch (error) {
         console.error('Error fetching data:', error);
-        setError(error.message);
+        showNotification(error.message || 'Error fetching data', 'error');
       } finally {
         setLoading(false);
       }
@@ -115,16 +139,20 @@ const MedicalRecords = () => {
         setMedicalRecords(records);
       } catch (error) {
         console.error('Error fetching medical records:', error);
-        setError(error.message);
+        showNotification(error.message || 'Error fetching medical records', 'error');
       }
     };
 
     fetchMedicalRecords();
   }, [doctorData]);
 
+  // Update handleSubmit to use notifications
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedPatient || !doctorData?.id) return;
+    if (!selectedPatient || !doctorData?.id) {
+      showNotification('Please select a patient', 'error');
+      return;
+    }
 
     try {
       const requestBody = {
@@ -160,221 +188,198 @@ const MedicalRecords = () => {
 
       const savedRecord = await response.json();
       
-      // Add the new record to the existing records
+      // Format the record to match the table structure
       const formattedRecord = {
         id: savedRecord.id,
-        date: savedRecord.recordDate,
+        recordDate: savedRecord.recordDate,
         patient: {
-          name: patients.find(p => p.id === selectedPatient)?.name,
-          email: patients.find(p => p.id === selectedPatient)?.email
+          name: patients.find(p => p.id === selectedPatient)?.name
         },
         condition: savedRecord.condition,
-        diagnosis: savedRecord.diagnosisType,
+        diagnosisType: savedRecord.diagnosisType,
         treatment: savedRecord.treatment,
         notes: savedRecord.notes
       };
 
-      setMedicalRecords(prevRecords => Array.isArray(prevRecords) ? [...prevRecords, formattedRecord] : [formattedRecord]);
+      // Update the records list
+      setMedicalRecords(prevRecords => 
+        Array.isArray(prevRecords) 
+          ? [...prevRecords, formattedRecord] 
+          : [formattedRecord]
+      );
+      
+      showNotification('Medical record saved successfully!', 'success');
       
       // Reset form
       setNewRecord({
+        condition: '',
         diagnosis: '',
         treatment: '',
-        notes: '',
-        condition: ''
+        notes: ''
       });
       setSelectedPatient('');
 
     } catch (error) {
       console.error('Error adding medical record:', error);
-      setError(error.message);
+      showNotification(error.message || 'Error saving medical record', 'error');
     }
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <h1>Medical Records Management</h1>
-        <p>Create and manage patient medical records</p>
-        {doctorData && (
-          <div className={styles.doctorInfo}>
-            <p>Dr. {doctorData.name}</p>
-            <p>Specialization: {doctorData.specialization}</p>
-          </div>
+    <div className="animate-fade-in">
+      <div className="dashboard-card">
+        {notification.show && (
+          <Notification
+            message={notification.message}
+            type={notification.type}
+            onClose={closeNotification}
+          />
         )}
-      </header>
 
-      <section className={styles.formSection}>
-        <div className={styles.sectionHeader}>
-          <h2>Add New Medical Record</h2>
+        <div className="card-header">
+          <div>
+            <h1 className="section-title">Medical Records Management</h1>
+            <p className="text-muted">Create and manage patient medical records</p>
+          </div>
         </div>
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.formGroup}>
-            <label htmlFor="patient">Patient</label>
-            <select
-              id="patient"
-              value={selectedPatient}
-              onChange={(e) => setSelectedPatient(e.target.value)}
-              required
-            >
-              <option value="">Select Patient</option>
-              {patients.map((patient) => (
-                <option key={patient.id} value={patient.id}>
-                  {patient.name}
-                </option>
-              ))}
-            </select>
-          </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="condition">Condition</label>
-            <input
-              id="condition"
-              type="text"
-              placeholder="Enter patient's condition"
-              value={newRecord.condition}
-              onChange={(e) => setNewRecord({...newRecord, condition: e.target.value})}
-              required
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="diagnosis">Diagnosis Type</label>
-            <select
-              id="diagnosis"
-              value={newRecord.diagnosis}
-              onChange={(e) => setNewRecord({...newRecord, diagnosis: e.target.value})}
-              required
-            >
-              <option value="">Select Diagnosis Type</option>
-              <option value="GENERAL">General - Common health concerns</option>
-              <option value="CHRONIC">Chronic - Long-term conditions</option>
-              <option value="ACUTE">Acute - Short-term urgent conditions</option>
-              <option value="PREVENTIVE">Preventive - Preventive care</option>
-            </select>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="treatment">Treatment</label>
-            <input
-              id="treatment"
-              type="text"
-              placeholder="Enter treatment details"
-              value={newRecord.treatment}
-              onChange={(e) => setNewRecord({...newRecord, treatment: e.target.value})}
-              required
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="notes">Notes</label>
-            <textarea
-              id="notes"
-              placeholder="Add any additional notes"
-              value={newRecord.notes}
-              onChange={(e) => setNewRecord({...newRecord, notes: e.target.value})}
-              required
-            />
-          </div>
-
-          <button type="submit" className={styles.submitButton}>
-            Add Medical Record
-          </button>
-        </form>
-      </section>
-
-      <section className={styles.recordsSection}>
-        <div className={styles.sectionHeader}>
-          <h2>Medical Records History</h2>
+        <div className="doctor-info mb-4">
+          <h3>Dr. {doctorData?.name || 'Loading...'}</h3>
+          <p>Specialization: {doctorData?.specialization || 'Loading...'}</p>
         </div>
-        <div className={styles.tableContainer}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Patient Name</th>
-                <th>Condition</th>
-                <th>Diagnosis</th>
-                <th>treatment</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {medicalRecords.length > 0 ? (
-                medicalRecords.map((record) => (
-                  record && (
-                    <tr key={record.id || Math.random()}>
-                      <td>
-                        <div className={styles.dateCell}>
-                          <span className={styles.date}>
-                            {record.date ? new Date(record.date).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric'
-                            }) : 'N/A'}
-                          </span>
-                          <span className={styles.time}>
-                            {record.date ? new Date(record.date).toLocaleTimeString('en-US', {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            }) : ''}
-                          </span>
-                        </div>
-                      </td>
-                      <td>
-                        <div className={styles.patientCell}>
-                          <span className={styles.patientName}>
-                            {record.patient?.name || 'Unknown Patient'}
-                          </span>
-                          <span className={styles.patientEmail}>
-                            {record.patient?.email || 'No email'}
-                          </span>
-                        </div>
-                      </td>
-                      <td>
-                        <div className={styles.conditionCell}>
-                          {record.condition || 'No condition specified'}
-                        </div>
-                      </td>
-                      <td>
-                        <span className={`${styles.diagnosisType} ${styles[record.diagnosis?.toLowerCase() || 'general']}`}>
-                          {record.diagnosis || 'Not specified'}
-                        </span>
-                      </td>
-                      <td>
-                        <div className={styles.treatmentCell}>
-                          {record.treatment || 'No prescription'}
-                        </div>
-                      </td>
-                      <td>
-                        <div className={styles.notesCell}>
-                          {record.notes || 'No notes'}
-                        </div>
-                      </td>
-                      <td>
-                        <span className={`${styles.status} ${styles.completed}`}>
-                          Completed
-                        </span>
-                      </td>
-                    </tr>
-                  )
-                ))
-              ) : (
+
+        <div className="record-form-section">
+          <h2 className="form-section-title">Add New Medical Record</h2>
+          <form onSubmit={handleSubmit} className="medical-record-form">
+            <div className="form-row">
+              <div className="form-group">
+                <label>Patient</label>
+                <select
+                  name="patient"
+                  value={selectedPatient}
+                  onChange={(e) => setSelectedPatient(e.target.value)}
+                  className="form-control"
+                  required
+                >
+                  <option value="">Select Patient</option>
+                  {patients.map((patient) => (
+                    <option key={patient.id} value={patient.id}>
+                      {patient.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Condition</label>
+                <input
+                  type="text"
+                  name="condition"
+                  value={newRecord.condition}
+                  onChange={(e) => setNewRecord({...newRecord, condition: e.target.value})}
+                  className="form-control"
+                  placeholder="Enter patient's condition"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Diagnosis Type</label>
+                <select
+                  name="diagnosisType"
+                  value={newRecord.diagnosis}
+                  onChange={(e) => setNewRecord({...newRecord, diagnosis: e.target.value})}
+                  className="form-control"
+                  required
+                >
+                  <option value="">Select Diagnosis Type</option>
+                  <option value="GENERAL">General - Common health concerns</option>
+                  <option value="CHRONIC">Chronic - Long-term conditions</option>
+                  <option value="ACUTE">Acute - Short-term urgent conditions</option>
+                  <option value="PREVENTIVE">Preventive - Preventive care</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Treatment</label>
+                <input
+                  type="text"
+                  name="treatment"
+                  value={newRecord.treatment}
+                  onChange={(e) => setNewRecord({...newRecord, treatment: e.target.value})}
+                  className="form-control"
+                  placeholder="Enter treatment details"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Notes</label>
+              <textarea
+                name="notes"
+                value={newRecord.notes}
+                onChange={(e) => setNewRecord({...newRecord, notes: e.target.value})}
+                className="form-control"
+                rows="3"
+                placeholder="Add any additional notes"
+              />
+            </div>
+
+            <div className="button-group">
+              <button type="submit" className="btn-dashboard btn-primary">
+                <FaPlus className="icon" />
+                Add Medical Record
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div className="records-history-section mt-4">
+          <h2 className="section-title">Medical Records History</h2>
+          <div className="table-container">
+            <table className="dashboard-table">
+              <thead>
                 <tr>
-                  <td colSpan="5" className={styles.noData}>
-                    No medical records found
-                  </td>
+                  <th>Date</th>
+                  <th>Patient Name</th>
+                  <th>Condition</th>
+                  <th>Diagnosis</th>
+                  <th>Treatment</th>
+                  <th>Notes</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {medicalRecords.map((record) => (
+                  <tr key={record.id}>
+                    <td className="text-dark">
+                      {new Date(record.recordDate).toLocaleDateString()}
+                    </td>
+                    <td className="text-dark">{record.patient?.name}</td>
+                    <td className="text-dark">{record.condition}</td>
+                    <td className="text-dark">{record.diagnosisType}</td>
+                    <td className="text-dark">{record.treatment}</td>
+                    <td className="text-dark text-truncate">{record.notes}</td>
+                  </tr>
+                ))}
+                {medicalRecords.length === 0 && (
+                  <tr>
+                    <td colSpan="6" className="text-center text-muted py-4">
+                      No medical records found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
 
-export default MedicalRecords;
+export default DoctorMedicalRecords;

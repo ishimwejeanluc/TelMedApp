@@ -6,62 +6,161 @@
 
 /* Sidebar Styling */
 .sidebar {
-  width: 250px;
-  background-color: #2c3e50;
-  color: white;
+  width: 280px;
+  height: 100vh;
+  background: white;
+  border-right: 1px solid rgba(0, 48, 135, 0.1);
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  position: sticky;
+  position: fixed;
+  left: 0;
   top: 0;
-  height: 100vh;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.sidebar-header {
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(0, 48, 135, 0.1);
+}
+
+.sidebar-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  color: #003087;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.menu-section {
+  flex: 1;
+  padding: 1.5rem 1rem;
   overflow-y: auto;
 }
 
-.sidebar h2 {
-  color: #ecf0f1;
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 1.5rem;
-  border-bottom: 2px solid rgba(255,255,255,0.1);
-  padding-bottom: 15px;
+.menu-label {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 0 1rem;
+  margin-bottom: 1rem;
 }
 
-.sidebar ul {
+.menu-items {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
-.sidebar ul li {
+.menu-item {
   display: flex;
   align-items: center;
-  padding: 12px 15px;
-  margin-bottom: 10px;
+  padding: 0.875rem 1rem;
+  margin: 0.25rem 0;
+  border-radius: 10px;
   cursor: pointer;
-  border-radius: 6px;
   transition: all 0.3s ease;
-  gap: 10px;
+  position: relative;
+  color: #64748b;
 }
 
-.sidebar ul li:hover,
-.sidebar ul li.active {
-  background-color: rgba(52, 73, 94, 0.7);
-  transform: translateX(5px);
+.menu-item:hover {
+  background: rgba(0, 48, 135, 0.05);
+  color: #003087;
 }
 
-.sidebar ul li span {
-  font-size: 1rem;
+.menu-item.active {
+  background: rgba(0, 48, 135, 0.1);
+  color: #003087;
+  font-weight: 600;
+}
+
+.menu-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+.menu-text {
+  font-size: 0.9375rem;
+}
+
+.active-indicator {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 20px;
+  background: #003087;
+  border-radius: 4px 0 0 4px;
+}
+
+.logout-button {
+  margin: 1rem;
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background: #fecaca;
+  transform: translateY(-2px);
+}
+
+.logout-button span {
+  font-size: 0.9375rem;
+}
+
+/* Scrollbar Styling */
+.menu-section::-webkit-scrollbar {
+  width: 5px;
+}
+
+.menu-section::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.menu-section::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 20px;
+}
+
+.menu-section::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
 }
 
 /* Content Area Styling */
 .content {
   flex: 1;
+  margin-left: 250px; /* Add this to offset the fixed sidebar */
   padding: 30px;
   background-color: #f4f6f7;
-  overflow-y: auto;
-  max-height: 100vh;
+  min-height: 100vh;
+  overflow-y: visible;
 }
+
 
 .content h1 {
   font-size: 2rem;
@@ -174,69 +273,3 @@ input:focus, select:focus {
   background-color: #c0392b;
 }
 
-/* Appointment Table */
-.appointment-table {
-  width: 100%;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.appointment-table th {
-  background-color: #3498db;
-  color: white;
-  padding: 15px;
-  text-align: left;
-}
-
-.appointment-table td {
-  padding: 15px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.appointment-table tr:last-child td {
-  border-bottom: none;
-}
-
-/* Status Indicators */
-.status {
-  font-weight: 600;
-  padding: 5px 10px;
-  border-radius: 4px;
-}
-
-.status.scheduled {
-  background-color: rgba(46, 204, 113, 0.1);
-  color: #2ecc71;
-}
-
-.status.completed {
-  background-color: rgba(52, 152, 219, 0.1);
-  color: #3498db;
-}
-
-.status.cancelled {
-  background-color: rgba(231, 76, 60, 0.1);
-  color: #e74c3c;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .dashboard-container {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-    height: auto;
-    position: static;
-  }
-
-  .content {
-    max-height: none;
-  }
-
-  .cards-container {
-    grid-template-columns: 1fr;
-  }
-}

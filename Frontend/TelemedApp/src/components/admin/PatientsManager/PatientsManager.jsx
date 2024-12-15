@@ -1,33 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './PatientsManager.module.css';
 
 const PatientsManager = () => {
   const navigate = useNavigate();
-  const [patients] = useState([
-    {
-      id: 1,
-      name: 'John Smith',
-      email: 'john.smith@example.com',
-      phone: '+1 234-567-8900',
-      age: 35,
-      assignedDoctor: 'Dr. Lucas Smith',
-      lastVisit: '2024-03-10',
-      nextAppointment: '2024-03-25',
-      status: 'active'
-    },
-    {
-      id: 2,
-      name: 'Jane Doe',
-      email: 'jane.doe@example.com',
-      phone: '+1 234-567-8901',
-      age: 28,
-      assignedDoctor: 'Dr. Emily Lee',
-      lastVisit: '2024-03-12',
-      nextAppointment: '2024-03-28',
-      status: 'active'
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Calculate age from date of birth
+  const calculateAge = (dateOfBirth) => {
+    if (!dateOfBirth) return 'N/A';
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
     }
-  ]);
+    return age;
+  };
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  const fetchPatients = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/patients`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch patients');
+      }
+
+      const data = await response.json();
+      setPatients(data);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load patients. Please try again later.');
+      console.error('Error fetching patients:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div className={styles.loading}>Loading...</div>;
+  if (error) return <div className={styles.error}>{error}</div>;
 
   return (
     <div className={styles.container}>
@@ -52,9 +76,6 @@ const PatientsManager = () => {
               <th>Email</th>
               <th>Phone</th>
               <th>Age</th>
-              <th>Assigned Doctor</th>
-              <th>Last Visit</th>
-              <th>Next Appointment</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -64,14 +85,11 @@ const PatientsManager = () => {
               <tr key={patient.id}>
                 <td>{patient.name}</td>
                 <td>{patient.email}</td>
-                <td>{patient.phone}</td>
-                <td>{patient.age}</td>
-                <td>{patient.assignedDoctor}</td>
-                <td>{patient.lastVisit}</td>
-                <td>{patient.nextAppointment}</td>
+                <td>{patient.phone || 'N/A'}</td>
+                <td>{calculateAge(patient.dateOfBirth)}</td>
                 <td>
-                  <span className={`${styles.status} ${styles[patient.status]}`}>
-                    {patient.status}
+                  <span className={`${styles.status} ${styles[patient.status || 'active']}`}>
+                    {patient.status || 'active'}
                   </span>
                 </td>
                 <td className={styles.actions}>

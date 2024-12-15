@@ -1,12 +1,36 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { useAuth } from '../context/AuthContext';
+import Notification from '../components/Notification/Notification';
+import '../styles/pages.css';
 
 const Login = () => {
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [notification, setNotification] = useState({
+    message: '',
+    type: '',
+    show: false
+  });
+
+  const showNotification = (message, type) => {
+    setNotification({
+      message,
+      type,
+      show: true
+    });
+  };
+
+  const closeNotification = () => {
+    setNotification({
+      message: '',
+      type: '',
+      show: false
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,30 +44,37 @@ const Login = () => {
       });
 
       if (response.ok) {
-        setShowSuccessMessage(true);
+        showNotification('Login successful! OTP sent to your email', 'success');
         setTimeout(() => {
           navigate('/verify-otp', { state: { email } });
         }, 2000);
       } else {
-        alert('Login failed. Please check your credentials.');
+        showNotification('Login failed. Please check your credentials.', 'error');
       }
     } catch (error) {
       console.error('Error logging in:', error);
-      alert('An error occurred. Please try again later.');
+      showNotification('An error occurred. Please try again later.', 'error');
     }
   };
 
   return (
-    <div className="full-page login-page">
+    <div className="auth-container">
       <Navbar />
-      <div className="container-fluid h-100">
-        <div className="row h-100">
+      {notification.show && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={closeNotification}
+        />
+      )}
+      
+      <div className="container min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="row w-100">
           {/* Left Side - Image Section */}
-          <div className="col-md-6 login-image-section d-none d-md-flex">
-            <div className="overlay"></div>
-            <div className="content text-white p-5 align-self-center">
-              <h2>Welcome Back!</h2>
-              <p>
+          <div className="col-md-6 d-none d-md-flex align-items-center">
+            <div className="info-section w-100">
+              <h2 className="h1 mb-4">Welcome Back!</h2>
+              <p className="lead mb-0">
                 Reconnect with your healthcare journey. 
                 Seamless, secure, and always at your fingertips.
               </p>
@@ -52,21 +83,21 @@ const Login = () => {
 
           {/* Right Side - Login Form */}
           <div className="col-md-6 d-flex align-items-center justify-content-center">
-            <div className="login-form-wrapper">
+            <div className="auth-form-wrapper animate-fadeInUp">
               <div className="text-center mb-4">
                 <img 
                   src="/telemed-logo.svg" 
                   alt="TeleMed Logo" 
-                  className="mb-3" 
+                  className="mb-4" 
                   style={{ maxWidth: '200px' }} 
                 />
-                <h2>Login to TeleMed</h2>
+                <h2 className="section-title h3">Login to TeleMed</h2>
                 <p className="text-muted">Access your personalized healthcare platform</p>
               </div>
 
-              <form onSubmit={handleSubmit} className="login-form">
-                <div className="mb-3">
-                  <label htmlFor="email" className="form-label">Email address</label>
+              <form onSubmit={handleSubmit}>
+                <div className="mb-4">
+                  <label className="form-label">Email address</label>
                   <div className="input-group">
                     <span className="input-group-text">
                       <i className="fas fa-envelope"></i>
@@ -74,16 +105,16 @@ const Login = () => {
                     <input 
                       type="email" 
                       className="form-control" 
-                      id="email" 
                       value={email} 
                       onChange={(e) => setEmail(e.target.value)} 
                       required
+                      placeholder="Enter your email"
                     />
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="password" className="form-label">Password</label>
+                <div className="mb-4">
+                  <label className="form-label">Password</label>
                   <div className="input-group">
                     <span className="input-group-text">
                       <i className="fas fa-lock"></i>
@@ -91,57 +122,50 @@ const Login = () => {
                     <input 
                       type="password" 
                       className="form-control" 
-                      id="password" 
                       value={password} 
                       onChange={(e) => setPassword(e.target.value)} 
                       required
+                      placeholder="Enter your password"
                     />
                   </div>
-                  <div className="d-flex justify-content-between mt-2">
-                    <div className="form-check">
-                      <input 
-                        type="checkbox" 
-                        className="form-check-input" 
-                        id="rememberMe"
-                      />
-                      <label className="form-check-label" htmlFor="rememberMe">
-                        Remember me
-                      </label>
-                    </div>
-                    <a href="#" className="text-primary">Forgot Password?</a>
+                </div>
+
+                <div className="d-flex justify-content-between mb-4">
+                  <div className="form-check">
+                    <input type="checkbox" className="form-check-input" id="remember" />
+                    <label className="form-check-label" htmlFor="remember">
+                      Remember me
+                    </label>
                   </div>
+                  <a href="/forgot-password" className="text-primary text-decoration-none">
+                    Forgot Password?
+                  </a>
                 </div>
 
-                <div className="d-grid">
-                  <button 
-                    type="submit" 
-                    className="btn btn-primary btn-lg rounded-pill"
-                  >
-                    Login
-                  </button>
-                </div>
+                <button type="submit" className="btn btn-gradient w-100 mb-4">
+                  Login
+                </button>
 
-                <div className="text-center mt-3">
-                  <p>
-                    Don't have an account? 
-                    <a href="/register" className="ms-2 text-primary">
+                <div className="text-center">
+                  <p className="mb-4">
+                    Don't have an account? {' '}
+                    <a href="/register" className="text-primary text-decoration-none">
                       Create Account
                     </a>
                   </p>
-                </div>
 
-                <div className="text-center mt-4">
-                  <p className="text-muted">Or login with</p>
-                  <div className="social-login">
-                    <a href="#" className="btn btn-outline-primary me-2">
+                  <div className="text-muted mb-4">Or login with</div>
+                  
+                  <div className="d-flex justify-content-center gap-3">
+                    <button type="button" className="btn btn-outline-secondary rounded-circle">
                       <i className="fab fa-google"></i>
-                    </a>
-                    <a href="#" className="btn btn-outline-primary me-2">
+                    </button>
+                    <button type="button" className="btn btn-outline-secondary rounded-circle">
                       <i className="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" className="btn btn-outline-primary">
+                    </button>
+                    <button type="button" className="btn btn-outline-secondary rounded-circle">
                       <i className="fab fa-apple"></i>
-                    </a>
+                    </button>
                   </div>
                 </div>
               </form>
@@ -149,40 +173,8 @@ const Login = () => {
           </div>
         </div>
       </div>
-      {showSuccessMessage && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg p-8 max-w-sm w-full mx-4 transform transition-all duration-500 ease-in-out">
-            <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                <svg
-                  className="h-6 w-6 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">Login Successful!</h3>
-              <p className="mt-2 text-sm text-gray-500">
-                Please check your email for the OTP verification code.
-              </p>
-              <div className="mt-4">
-                <div className="inline-block h-2 w-2 bg-blue-600 rounded-full animate-bounce"></div>
-                <div className="inline-block h-2 w-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                <div className="inline-block h-2 w-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
-}
+};
 
 export default Login;

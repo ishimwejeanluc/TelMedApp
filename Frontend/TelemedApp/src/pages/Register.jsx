@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
+import Notification from '../components/Notification/Notification';
+import '../styles/pages.css';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -15,7 +17,27 @@ function Register() {
     role: 'PATIENT'
   });
 
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [notification, setNotification] = useState({
+    message: '',
+    type: '',
+    show: false
+  });
+
+  const showNotification = (message, type) => {
+    setNotification({
+      message,
+      type,
+      show: true
+    });
+  };
+
+  const closeNotification = () => {
+    setNotification({
+      message: '',
+      type: '',
+      show: false
+    });
+  };
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -24,54 +46,77 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-   try {
-    const response = await fetch('http://localhost:8080/api/accounts/createAccount', {
+    
+    // Add password validation
+    if (formData.password !== formData.confirmPassword) {
+      showNotification('Passwords do not match!', 'error');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8080/api/accounts/createAccount', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-    });
+      });
 
-    if (response.ok) {
-        const data = await response.json().catch(() => null); // Handle empty response
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 5000); // Hide after 5 seconds
-    } else {
-        console.error('Error creating account:', response.statusText);
+      if (response.ok) {
+        showNotification('Account created successfully!', 'success');
+        // Reset form after successful registration
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          dateOfBirth: '',
+          gender: '',
+          address: '',
+          username: '',
+          password: '',
+          confirmPassword: '',
+          role: 'PATIENT'
+        });
+      } else {
+        const errorData = await response.json();
+        showNotification(errorData.message || 'Error creating account', 'error');
+      }
+    } catch (error) {
+      console.error('Error creating account:', error);
+      showNotification('An error occurred while creating your account', 'error');
     }
-} catch (error) {
-    console.error('Error creating account:', error);
-}
   };
 
   return (
-    <div className="full-page register-page" style={{ backgroundColor: 'var(--background-color)', color: 'var(--text-color)' }}>
+    <div className="auth-container">
       <Navbar />
-      {showSuccess && (
-        <div className="alert alert-success position-fixed top-0 end-0 m-3" role="alert" style={{ zIndex: 1050 }}>
-          <strong>Success!</strong> Your account has been created successfully.
-        </div>
+      {notification.show && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={closeNotification}
+        />
       )}
-      <div className="container-fluid h-100">
-        <div className="row h-100">
+      
+      <div className="container min-vh-100 d-flex align-items-center">
+        <div className="row w-100">
           {/* Left Side - Registration Form */}
-          <div className="col-md-6 d-flex align-items-center justify-content-center">
-            <div className="register-form-wrapper" style={{ backgroundColor: 'var(--surface-color)', padding: '2rem', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-md)', color: 'var(--text-color)' }}>
+          <div className="col-md-6">
+            <div className="auth-form-wrapper animate-fadeInUp">
               <div className="text-center mb-4">
                 <img 
                   src="/telemed-logo.svg" 
                   alt="TeleMed Logo" 
-                  className="mb-3" 
+                  className="mb-4" 
                   style={{ maxWidth: '200px' }} 
                 />
-                <h2 style={{ color: 'var(--text-color)' }}>Create Your Account</h2>
-                <p className="text-muted" style={{ color: 'var(--text-color-light)' }}>Join TeleMed Healthcare Platform</p>
+                <h2 className="section-title h3">Create Your Account</h2>
+                <p className="text-muted">Join TeleMed Healthcare Platform</p>
               </div>
 
-              <form className="register-form" onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label htmlFor="name" className="form-label" style={{ color: 'var(--text-color)' }}>Full Name</label>
+              <form onSubmit={handleSubmit}>
+                <div className="mb-4">
+                  <label className="form-label">Full Name</label>
                   <div className="input-group">
                     <span className="input-group-text">
                       <i className="fas fa-user"></i>
@@ -83,12 +128,13 @@ function Register() {
                       placeholder="Enter your full name"
                       value={formData.name}
                       onChange={handleChange}
+                      required
                     />
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="phone" className="form-label" style={{ color: 'var(--text-color)' }}>Phone Number</label>
+                <div className="mb-4">
+                  <label className="form-label">Phone Number</label>
                   <div className="input-group">
                     <span className="input-group-text">
                       <i className="fas fa-phone"></i>
@@ -100,12 +146,13 @@ function Register() {
                       placeholder="Enter your phone number"
                       value={formData.phone}
                       onChange={handleChange}
+                      required
                     />
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="dateOfBirth" className="form-label" style={{ color: 'var(--text-color)' }}>Date of Birth</label>
+                <div className="mb-4">
+                  <label className="form-label">Date of Birth</label>
                   <div className="input-group">
                     <span className="input-group-text">
                       <i className="fas fa-calendar"></i>
@@ -116,13 +163,14 @@ function Register() {
                       id="dateOfBirth"
                       value={formData.dateOfBirth}
                       onChange={handleChange}
+                      required
                     />
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="gender" className="form-label" style={{ color: 'var(--text-color)' }}>Gender</label>
-                  <select className="form-select" id="gender" value={formData.gender} onChange={handleChange}>
+                <div className="mb-4">
+                  <label className="form-label">Gender</label>
+                  <select className="form-select" id="gender" value={formData.gender} onChange={handleChange} required>
                     <option value="">Select gender</option>
                     <option value="MALE">Male</option>
                     <option value="FEMALE">Female</option>
@@ -130,8 +178,8 @@ function Register() {
                   </select>
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="address" className="form-label" style={{ color: 'var(--text-color)' }}>Address</label>
+                <div className="mb-4">
+                  <label className="form-label">Address</label>
                   <div className="input-group">
                     <span className="input-group-text">
                       <i className="fas fa-map-marker-alt"></i>
@@ -143,12 +191,13 @@ function Register() {
                       placeholder="Enter your address"
                       value={formData.address}
                       onChange={handleChange}
+                      required
                     />
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="username" className="form-label" style={{ color: 'var(--text-color)' }}>Username</label>
+                <div className="mb-4">
+                  <label className="form-label">Username</label>
                   <div className="input-group">
                     <span className="input-group-text">
                       <i className="fas fa-user-tag"></i>
@@ -160,12 +209,13 @@ function Register() {
                       placeholder="Choose a username"
                       value={formData.username}
                       onChange={handleChange}
+                      required
                     />
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="email" className="form-label" style={{ color: 'var(--text-color)' }}>Email address</label>
+                <div className="mb-4">
+                  <label className="form-label">Email address</label>
                   <div className="input-group">
                     <span className="input-group-text">
                       <i className="fas fa-envelope"></i>
@@ -177,12 +227,13 @@ function Register() {
                       placeholder="Enter your email"
                       value={formData.email}
                       onChange={handleChange}
+                      required
                     />
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="password" className="form-label" style={{ color: 'var(--text-color)' }}>Password</label>
+                <div className="mb-4">
+                  <label className="form-label">Password</label>
                   <div className="input-group">
                     <span className="input-group-text">
                       <i className="fas fa-lock"></i>
@@ -194,12 +245,13 @@ function Register() {
                       placeholder="Create a strong password"
                       value={formData.password}
                       onChange={handleChange}
+                      required
                     />
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="confirmPassword" className="form-label" style={{ color: 'var(--text-color)' }}>Confirm Password</label>
+                <div className="mb-4">
+                  <label className="form-label">Confirm Password</label>
                   <div className="input-group">
                     <span className="input-group-text">
                       <i className="fas fa-lock"></i>
@@ -211,23 +263,25 @@ function Register() {
                       placeholder="Confirm your password"
                       value={formData.confirmPassword}
                       onChange={handleChange}
+                      required
                     />
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <label className="form-label" style={{ color: 'var(--text-color)' }}>Account Type</label>
-                  <div className="d-flex">
-                    <div className="form-check me-3">
+                <div className="mb-4">
+                  <label className="form-label">Account Type</label>
+                  <div className="d-flex gap-4">
+                    <div className="form-check">
                       <input 
                         type="radio" 
                         className="form-check-input" 
-                        id="patientType" 
-                        name="accountType"
+                        id="patientType"
+                        name="role"
+                        value="PATIENT"
                         checked={formData.role === 'PATIENT'}
                         onChange={handleChange}
                       />
-                      <label className="form-check-label" htmlFor="patientType" style={{ color: 'var(--text-color)' }}>
+                      <label className="form-check-label" htmlFor="patientType">
                         Patient
                       </label>
                     </div>
@@ -235,60 +289,55 @@ function Register() {
                       <input 
                         type="radio" 
                         className="form-check-input" 
-                        id="doctorType" 
-                        name="accountType"
+                        id="doctorType"
+                        name="role"
+                        value="DOCTOR"
                         checked={formData.role === 'DOCTOR'}
                         onChange={handleChange}
                       />
-                      <label className="form-check-label" htmlFor="doctorType" style={{ color: 'var(--text-color)' }}>
+                      <label className="form-check-label" htmlFor="doctorType">
                         Doctor
                       </label>
                     </div>
                   </div>
                 </div>
 
-                <div className="mb-3 form-check">
+                <div className="mb-4 form-check">
                   <input 
                     type="checkbox" 
                     className="form-check-input" 
                     id="termsCheck"
+                    required
                   />
-                  <label className="form-check-label" htmlFor="termsCheck" style={{ color: 'var(--text-color)' }}>
+                  <label className="form-check-label" htmlFor="termsCheck">
                     I agree to the Terms and Conditions
                   </label>
                 </div>
 
-                <div className="d-grid">
-                  <button 
-                    type="submit" 
-                    className="btn btn-primary" 
-                    style={{ backgroundColor: 'var(--primary-color)', borderColor: 'var(--primary-color)' }}
-                  >
-                    Sign Up
-                  </button>
-                </div>
+                <button type="submit" className="btn btn-gradient w-100 mb-4">
+                  Create Account
+                </button>
 
-                <div className="text-center mt-3">
-                  <p>
-                    Already have an account? 
-                    <a href="/login" className="ms-2 text-primary">
+                <div className="text-center">
+                  <p className="mb-4">
+                    Already have an account? {' '}
+                    <a href="/login" className="text-primary text-decoration-none">
                       Login
                     </a>
                   </p>
-                </div>
 
-                <div className="text-center mt-4">
-                  <p className="text-muted">Or register with</p>
-                  <div className="social-register">
-                    <a href="#" className="btn btn-outline-primary me-2">
+                  <div className="text-muted mb-4">Or register with</div>
+                  
+                  <div className="d-flex justify-content-center gap-3">
+                    <button type="button" className="btn btn-outline-secondary rounded-circle">
                       <i className="fab fa-google"></i>
-                    </a>
-                    <a href="#" className="btn btn-outline-primary me-2">
+                    </button>
+                    <button type="button" className="btn btn-outline-secondary rounded-circle">
                       <i className="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" className="btn btn-outline-primary">
+                    </button>
+                    <button type="button" className="btn btn-outline-secondary rounded-circle">
                       <i className="fab fa-apple"></i>
-                    </a>
+                    </button>
                   </div>
                 </div>
               </form>
@@ -296,28 +345,27 @@ function Register() {
           </div>
 
           {/* Right Side - Benefits Section */}
-          <div className="col-md-6 register-info-section d-none d-md-flex" style={{ backgroundColor: 'var(--primary-color-dark)', color: 'white' }}>
-            <div className="overlay"></div>
-            <div className="content text-white p-5 align-self-center">
-              <h2>Why Join TeleMed?</h2>
-              <ul className="benefits-list">
-                <li>
+          <div className="col-md-6 d-none d-md-flex align-items-center">
+            <div className="info-section w-100">
+              <h2 className="h1 mb-4">Why Join TeleMed?</h2>
+              <ul className="list-unstyled mb-0">
+                <li className="mb-3">
                   <i className="fas fa-check-circle me-2"></i>
                   Convenient Online Consultations
                 </li>
-                <li>
+                <li className="mb-3">
                   <i className="fas fa-check-circle me-2"></i>
                   Secure and Private Healthcare
                 </li>
-                <li>
+                <li className="mb-3">
                   <i className="fas fa-check-circle me-2"></i>
                   Access to Top Medical Professionals
                 </li>
-                <li>
+                <li className="mb-3">
                   <i className="fas fa-check-circle me-2"></i>
                   Personalized Health Tracking
                 </li>
-                <li>
+                <li className="mb-3">
                   <i className="fas fa-check-circle me-2"></i>
                   24/7 Medical Support
                 </li>

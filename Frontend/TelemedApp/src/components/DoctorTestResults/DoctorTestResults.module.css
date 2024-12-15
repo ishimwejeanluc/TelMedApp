@@ -79,3 +79,43 @@
 .submitButton:hover {
   background-color: #1d4ed8;
 } 
+
+.test-form-section {
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 15px;
+}
+
+.search-filter {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.status-blood {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+
+.status-urine {
+  background: rgba(234, 179, 8, 0.1);
+  color: #eab308;
+}
+
+.status-imaging {
+  background: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+}
+
+.status-other {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+} 

@@ -61,6 +61,7 @@
 .mainContent {
   flex: 1;
   padding: 2rem;
+  overflow-y: auto;
 }
 
 /* Welcome Section */
@@ -105,69 +106,82 @@
 /* Statistics Grid */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
 .statCard {
   background: white;
-  border-radius: 12px;
   padding: 1.5rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
+  border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
 }
 
 .statIcon {
-  padding: 0.75rem;
-  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.blue .statIcon { background-color: #eff6ff; color: #3b82f6; }
-.green .statIcon { background-color: #f0fdf4; color: #10b981; }
-.purple .statIcon { background-color: #f5f3ff; color: #8b5cf6; }
-.orange .statIcon { background-color: #fff7ed; color: #f97316; }
-
-.statInfo {
-  flex: 1;
-}
-
-.statTitle {
-  font-size: 0.875rem;
-  color: #64748b;
-  margin-bottom: 0.5rem;
-}
-
-.statValue {
   font-size: 1.5rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 0.5rem;
 }
 
-.statTrend {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
+.statCard:nth-child(1) .statIcon {
+  background-color: #eff6ff;
+  color: #3b82f6;
 }
 
-.trendUp {
+.statCard:nth-child(2) .statIcon {
   background-color: #f0fdf4;
   color: #10b981;
 }
 
-.trendDown {
-  background-color: #fef2f2;
-  color: #ef4444;
+.statCard:nth-child(3) .statIcon {
+  background-color: #f5f3ff;
+  color: #8b5cf6;
+}
+
+.statCard:nth-child(4) .statIcon {
+  background-color: #fff7ed;
+  color: #f97316;
+}
+
+.statInfo h3 {
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.statValue {
+  color: #1e293b;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.recentActivity {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.recentActivity h2 {
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
 /* Recent Appointments */
@@ -298,6 +312,12 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+.searchIcon {
+  color: #94a3b8;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
 .searchBar input {
   border: none;
   outline: none;
@@ -349,6 +369,11 @@
   margin-right: 1rem;
 }
 
+.resultIcon i {
+  color: #64748b;
+  font-size: 1.25rem;
+}
+
 .resultInfo {
   flex: 1;
 }
@@ -364,14 +389,24 @@
   color: #64748b;
 }
 
-.icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: #64748b;
-}
-
 @media (max-width: 640px) {
   .searchSection {
     margin: 1rem;
   }
+}
+
+.dashboardContent {
+  padding: 2rem;
+}
+
+.dashboardContent h1 {
+  margin-bottom: 2rem;
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Add margin below the search component */
+.dashboardContent > :global(.globalSearch) {
+  margin-bottom: 2rem;
 } 

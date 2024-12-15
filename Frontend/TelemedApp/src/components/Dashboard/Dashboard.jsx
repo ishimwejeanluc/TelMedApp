@@ -5,18 +5,13 @@ import MedicalRecords from '../MedicalRecords/MedicalRecords';
 import TestResults from '../TestResults/TestResults';
 import Settings from '../Settings/Settings';
 
-const Dashboard = ({ doctorName, specialization }) => {
+const Dashboard = () => {
   const [activePage, setActivePage] = useState('dashboard');
 
   const renderContent = () => {
     switch (activePage) {
       case 'appointments':
-        return (
-          <Appointments
-            preselectedDoctor={doctorName}
-            preselectedSpecialization={specialization}
-          />
-        );
+        return <Appointments />;
       case 'medicalRecords':
         return <MedicalRecords />;
       case 'testResults':
@@ -27,13 +22,20 @@ const Dashboard = ({ doctorName, specialization }) => {
         return (
           <div>
             <h1>Welcome to the TeleMed Dashboard!</h1>
-            <p className="text-muted">
-              You are currently viewing the profile of <strong>{doctorName}</strong>, a specialist in{' '}
-              <strong>{specialization}</strong>.
-            </p>
-            <p>
-              Use the sidebar to navigate through your appointments, medical records, test results, and settings.
-            </p>
+            <div className="cards-container">
+              <div className="card">
+                <h3>Total Doctors</h3>
+                <p>10</p>
+              </div>
+              <div className="card">
+                <h3>Recent Appointments</h3>
+                <p>3</p>
+              </div>
+              <div className="card">
+                <h3>Medical Results</h3>
+                <p>5</p>
+              </div>
+            </div>
           </div>
         );
     }

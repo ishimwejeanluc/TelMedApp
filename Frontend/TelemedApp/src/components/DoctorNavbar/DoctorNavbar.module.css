@@ -1,101 +1,109 @@
 .navbar {
+  width: 280px;
+  height: 100vh;
+  background: white;
+  border-right: 1px solid rgba(0, 48, 135, 0.1);
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: sticky;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
   top: 0;
   z-index: 1000;
-}
-
-.navLeft {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
+  transition: all 0.3s ease;
 }
 
 .logo {
+  padding: 2rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
-  color: #2563eb;
-  font-size: 1.25rem;
-  font-weight: 600;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(0, 48, 135, 0.1);
+  color: #003087;
 }
 
 .logo svg {
   font-size: 1.5rem;
 }
 
+.logo span {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
 .navLinks {
+  padding: 1.5rem 1rem;
   display: flex;
-  gap: 1.5rem;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .navLink {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
+  gap: 1rem;
+  padding: 1rem;
+  border: none;
+  background: none;
   color: #64748b;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  transition: all 0.2s;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9375rem;
+  width: 100%;
+  text-align: left;
 }
 
 .navLink:hover {
-  color: #2563eb;
-  background-color: #eff6ff;
+  background: rgba(0, 48, 135, 0.05);
+  color: #003087;
 }
 
-.active {
-  color: #2563eb;
-  background-color: #eff6ff;
-}
-
-.navRight {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.doctorInfo {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.doctorName {
-  color: #1e293b;
+.navLink.active {
+  background: rgba(0, 48, 135, 0.1);
+  color: #003087;
   font-weight: 600;
 }
 
+.navLink svg {
+  font-size: 1.25rem;
+}
+
+.doctorInfo {
+  margin-top: auto;
+  padding: 1.5rem;
+  border-top: 1px solid rgba(0, 48, 135, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.doctorName {
+  font-weight: 600;
+  color: #003087;
+}
+
 .specialization {
-  color: #64748b;
   font-size: 0.875rem;
+  color: #64748b;
 }
 
 .logoutButton {
+  margin: 1rem;
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background-color: #fee2e2;
-  color: #dc2626;
-  border: none;
-  border-radius: 0.5rem;
+  justify-content: center;
+  gap: 0.75rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
 }
 
 .logoutButton:hover {
-  background-color: #fecaca;
-}
-
-.logoutButton svg {
-  font-size: 1.25rem;
+  background: #fecaca;
+  transform: translateY(-2px);
 } 

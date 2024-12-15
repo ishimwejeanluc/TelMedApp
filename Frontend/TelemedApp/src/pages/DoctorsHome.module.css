@@ -175,4 +175,35 @@
   .doctorsList {
     grid-template-columns: 1fr;
   }
+}
+
+.bg-gradient-dark {
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+}
+
+.bg-primary-light {
+  background-color: rgba(var(--primary-color-rgb), 0.1);
+}
+
+.bg-success-light {
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.object-fit-cover {
+  object-fit: cover;
+}
+
+.schedule-info {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 } 

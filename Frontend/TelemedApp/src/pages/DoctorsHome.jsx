@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import styles from './DoctorsHome.module.css';
+import '../styles/pages.css';
 
 // Import doctor images
 import drSmithImage from '../assets/images/Dr.smith.jpg';
@@ -54,63 +55,105 @@ const DoctorsHome = () => {
   };
 
   return (
-    <>
+    <div className="page-wrapper">
       <Navbar />
-      <div className={styles.container}>
-        <header className={styles.header}>
-          <h1 className={styles.title}>Meet Our Expert Doctors</h1>
-          <p className={styles.subtitle}>
-            Connect with our experienced healthcare professionals who are dedicated to providing you with the best medical care.
-          </p>
-        </header>
-
-        <div className={styles.doctorsList}>
-          {doctors.map((doctor) => (
-            <div key={doctor.id} className={styles.doctorCard}>
-              <div className={styles.imageContainer}>
-                <img
-                  src={doctor.image}
-                  alt={`Dr. ${doctor.name}`}
-                  className={styles.doctorImage}
-                />
-              </div>
-              <div className={styles.cardBody}>
-                <h3 className={styles.doctorName}>{doctor.name}</h3>
-                <p className={styles.age}>{doctor.age} years old</p>
-                <span className={styles.specialization}>
-                  {doctor.specialization}
-                </span>
-                <p className={styles.description}>{doctor.description}</p>
-                <button
-                  className={styles.scheduleButton}
-                  onClick={() => toggleSchedule(doctor.id)}
-                >
-                  {viewedDoctorId === doctor.id ? 'Hide Schedule' : 'View Schedule'}
-                </button>
-                
-                {viewedDoctorId === doctor.id && (
-                  <div className={styles.scheduleInfo}>
-                    <p className={styles.scheduleText}>
-                      <strong>Available:</strong> {doctor.schedule}
-                    </p>
-                    <button
-                      className={styles.bookButton}
-                      onClick={() => handleBookAppointment(doctor.id)}
-                    >
-                      Book Appointment
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
+      
+      <section className="hero-section">
+        <div className="hero-background"></div>
+        <div className="container hero-content">
+          <header className="text-center mb-5 animate-fadeInUp">
+            <h1 className="display-4 text-white mb-3">Meet Our Expert Doctors</h1>
+            <p className="lead text-white-50">
+              Connect with our experienced healthcare professionals who are dedicated to providing you with the best medical care.
+            </p>
+          </header>
         </div>
+      </section>
 
-        <footer className={styles.footer}>
-          <p>© {new Date().getFullYear()} TeleMed. All rights reserved.</p>
-        </footer>
-      </div>
-    </>
+      <section className="page-section bg-light">
+        <div className="container">
+          <div className="row g-4">
+            {doctors.map((doctor, index) => (
+              <div key={doctor.id} className="col-lg-4 col-md-6 animate-fadeInUp" 
+                style={{ animationDelay: `${0.2 * (index + 1)}s` }}>
+                <div className="doctor-card h-100">
+                  <div className="position-relative">
+                    <img
+                      src={doctor.image}
+                      alt={`Dr. ${doctor.name}`}
+                      className="w-100 h-100 object-fit-cover rounded-top"
+                      style={{ height: '300px' }}
+                    />
+                    <div className="position-absolute bottom-0 start-0 w-100 p-3 bg-gradient-dark text-white">
+                      <h3 className="h4 mb-1">{doctor.name}</h3>
+                      <p className="mb-0 text-white-50">{doctor.specialization}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4">
+                    <div className="d-flex justify-content-between mb-3">
+                      <span className="badge bg-primary-light text-primary">
+                        {doctor.age} years experience
+                      </span>
+                      <span className="badge bg-success-light text-success">
+                        {doctor.availability} available
+                      </span>
+                    </div>
+                    
+                    <p className="text-muted mb-4">{doctor.description}</p>
+                    
+                    <button
+                      className="btn btn-outline-primary w-100 mb-3"
+                      onClick={() => toggleSchedule(doctor.id)}
+                    >
+                      {viewedDoctorId === doctor.id ? 'Hide Schedule' : 'View Schedule'}
+                    </button>
+                    
+                    {viewedDoctorId === doctor.id && (
+                      <div className="schedule-info animate-fadeInUp">
+                        <div className="p-3 bg-light rounded mb-3">
+                          <h4 className="h6 mb-2">Available Hours</h4>
+                          <p className="mb-0 text-muted small">
+                            {doctor.schedule}
+                          </p>
+                        </div>
+                        <button
+                          className="btn btn-gradient w-100"
+                          onClick={() => handleBookAppointment(doctor.id)}
+                        >
+                          Book Appointment
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="page-section info-section">
+        <div className="container text-center">
+          <h2 className="h1 text-white mb-4">Ready to Get Started?</h2>
+          <p className="lead text-white-50 mb-4">
+            Book your consultation with one of our experienced healthcare professionals today.
+          </p>
+          <button 
+            className="btn btn-light btn-lg rounded-pill px-5"
+            onClick={() => navigate('/register')}
+          >
+            Register Now
+          </button>
+        </div>
+      </section>
+
+      <footer className="py-4 bg-dark text-white-50 text-center">
+        <div className="container">
+          <p className="mb-0">© {new Date().getFullYear()} TeleMed. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
   );
 };
 
