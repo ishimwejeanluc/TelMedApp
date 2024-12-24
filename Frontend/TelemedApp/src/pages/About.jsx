@@ -1,8 +1,45 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
 import '../styles/pages.css';
+import medicalTeamImage from '../assets/images/medicalteam.jpg';
 
 function About() {
+  const teamMembers = [
+    {
+      name: "Dr. Sarah Johnson",
+      role: "Chief Medical Officer",
+      description: "With over 15 years of experience in telemedicine"
+    },
+    {
+      name: "Dr. Michael Chen",
+      role: "Head of Technology",
+      description: "Leading our digital healthcare innovations"
+    },
+    {
+      name: "Dr. Lisa Williams",
+      role: "Patient Care Director",
+      description: "Ensuring the highest standards of patient care"
+    }
+  ];
+
+  const achievements = [
+    {
+      number: "50,000+",
+      label: "Patients Served",
+      icon: "fa-users"
+    },
+    {
+      number: "1,000+",
+      label: "Healthcare Providers",
+      icon: "fa-user-md"
+    },
+    {
+      number: "98%",
+      label: "Patient Satisfaction",
+      icon: "fa-heart"
+    }
+  ];
+
   return (
     <div className="about-page">
       <Navbar />
@@ -14,19 +51,25 @@ function About() {
             <div className="col-md-6 animate-fadeInUp">
               <h1 className="display-4 text-white mb-4">About TeleMed</h1>
               <p className="lead text-white-50">
-                Transforming Healthcare Delivery Through Technology
+                Revolutionizing Healthcare Through Digital Innovation
               </p>
               <p className="text-white-50">
-                TeleMed is an innovative healthcare platform designed to bridge the gap between patients 
-                and healthcare providers. Our mission is to make quality healthcare accessible, convenient, 
-                and patient-centric.
+                Founded in 2020, TeleMed has grown to become a leading telemedicine platform, 
+                connecting patients with healthcare providers nationwide. Our mission is to make 
+                quality healthcare accessible to everyone, anywhere.
               </p>
             </div>
             <div className="col-md-6 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
               <img 
-                src="/medical-team.jpg" 
+                src={medicalTeamImage}
                 alt="Medical Team" 
-                className="img-fluid rounded-4 shadow-lg" 
+                className="img-fluid rounded-4 shadow-lg"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  objectFit: 'cover',
+                  borderRadius: '1rem'
+                }}
               />
             </div>
           </div>
@@ -65,28 +108,38 @@ function About() {
             </div>
             <div className="col-md-8">
               <div className="feature-card">
-                <h3 className="section-title">How We Work</h3>
-                <p className="lead text-muted">
-                  TeleMed connects patients with licensed healthcare professionals through secure, 
-                  high-quality video consultations. Our platform ensures seamless communication, 
-                  easy appointment scheduling, and comprehensive medical record management.
-                </p>
-                <div className="row mt-5">
-                  <div className="col-md-4 text-center">
-                    <i className="fas fa-users fa-3x mb-3" style={{ color: 'var(--primary-color)' }}></i>
-                    <h4 className="h5">1000+ Doctors</h4>
-                  </div>
-                  <div className="col-md-4 text-center">
-                    <i className="fas fa-globe fa-3x mb-3" style={{ color: 'var(--primary-color)' }}></i>
-                    <h4 className="h5">Nationwide Coverage</h4>
-                  </div>
-                  <div className="col-md-4 text-center">
-                    <i className="fas fa-shield-alt fa-3x mb-3" style={{ color: 'var(--primary-color)' }}></i>
-                    <h4 className="h5">HIPAA Compliant</h4>
-                  </div>
+                <h3 className="section-title">Our Impact</h3>
+                <div className="row mt-4">
+                  {achievements.map((achievement, index) => (
+                    <div key={index} className="col-md-4 text-center mb-4">
+                      <i className={`fas ${achievement.icon} fa-2x mb-3 text-primary`}></i>
+                      <h2 className="h1 fw-bold">{achievement.number}</h2>
+                      <p className="text-muted">{achievement.label}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="page-section">
+        <div className="container">
+          <h2 className="section-title text-center mb-5">Our Leadership Team</h2>
+          <div className="row">
+            {teamMembers.map((member, index) => (
+              <div key={index} className="col-md-4 mb-4">
+                <div className="feature-card text-center h-100">
+                  <div className="mb-4">
+                    <i className="fas fa-user-md fa-3x text-primary"></i>
+                  </div>
+                  <h3 className="h4 mb-3">{member.name}</h3>
+                  <p className="text-primary mb-2">{member.role}</p>
+                  <p className="text-muted">{member.description}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

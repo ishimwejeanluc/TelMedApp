@@ -119,7 +119,7 @@ const AppointmentTable = () => {
     fetchDoctorData();
   }, [isAuthenticated, user, navigate]);
 
-  const itemsPerPage = 1;
+  const itemsPerPage = 5;
 
   // Updated search functionality
   const filteredAppointments = appointments.filter(appointment => {

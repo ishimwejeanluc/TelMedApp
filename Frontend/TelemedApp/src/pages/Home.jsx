@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import '../styles/pages.css';
+import drJobImage from '../assets/images/drjob.jpeg';
+import styles from './Home.module.css';
 
 function Home() {
   const features = [
@@ -23,37 +25,29 @@ function Home() {
   ];
 
   return (
-    <div className="home-page">
+    <div className={styles.container}>
       <Navbar />
       
-      <section className="hero-section">
-        <div className="hero-background"></div>
-        <div className="container hero-content">
-          <div className="row align-items-center">
-            <div className="col-lg-6 animate-fadeInUp">
-              <h1 className="display-4 mb-4 fw-bold text-white">
-                Your Health, Our Priority
-              </h1>
-              <p className="lead mb-4 text-white-50">
-                Experience healthcare reimagined with TeleMed. 
-                Convenient, compassionate, and cutting-edge medical care at your fingertips.
-              </p>
-              <div className="d-flex gap-3">
-                <Link to="/register" className="btn btn-gradient">
-                  Get Started
-                </Link>
-                <Link to="/about" className="btn btn-outline-light rounded-pill px-4">
-                  Learn More
-                </Link>
-              </div>
+      <section className={styles.hero}>
+        <div className={styles.heroContent}>
+          <div className={styles.textContent}>
+            <h1>Your Health, Our Priority</h1>
+            <p>Connect with professional healthcare providers anytime, anywhere.</p>
+            <div className="d-flex gap-3">
+              <Link to="/register" className="btn btn-gradient">
+                Get Started
+              </Link>
+              <Link to="/about" className="btn btn-outline-light rounded-pill px-4">
+                Learn More
+              </Link>
             </div>
-            <div className="col-lg-6 d-none d-lg-block animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-              <img 
-                src="/medical-hero.png" 
-                alt="TeleMed Healthcare" 
-                className="img-fluid rounded-4 shadow-lg"
-              />
-            </div>
+          </div>
+          <div className={styles.imageContent}>
+            <img 
+              src={drJobImage} 
+              alt="Professional Healthcare Doctor"
+              className={styles.heroImage}
+            />
           </div>
         </div>
       </section>
