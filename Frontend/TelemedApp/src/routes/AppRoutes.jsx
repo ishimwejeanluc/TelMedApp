@@ -59,6 +59,9 @@ const Unauthorized = () => (
   </div>
 );
 
+import ForgotPassword from '../pages/ForgotPassword';
+import ResetPassword from '../pages/ResetPassword';
+
 function AppRoutes() {
   return (
     <Routes>
@@ -71,6 +74,8 @@ function AppRoutes() {
       <Route path="/verify-otp" element={<VerifyOtp />} />
       <Route path="/doctor" element={<DoctorHome />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:encodedEmail" element={<ResetPassword />} />
 
       {/* Doctor Routes */}
       <Route 

@@ -25,6 +25,39 @@ function Contact() {
     alert('Thank you for your message. We will get back to you soon!');
   };
 
+  const officeLocations = [
+    {
+      city: "New York",
+      address: "123 Healthcare Ave, NY 10001",
+      phone: "(212) 555-0123"
+    },
+    {
+      city: "Los Angeles",
+      address: "456 Medical Blvd, LA 90001",
+      phone: "(310) 555-0123"
+    },
+    {
+      city: "Chicago",
+      address: "789 Wellness St, CH 60601",
+      phone: "(312) 555-0123"
+    }
+  ];
+
+  const faqItems = [
+    {
+      question: "How quickly can I get an appointment?",
+      answer: "Most appointments can be scheduled within 24-48 hours of request."
+    },
+    {
+      question: "What insurance plans do you accept?",
+      answer: "We accept most major insurance plans. Contact us for specific details."
+    },
+    {
+      question: "Is telemedicine right for me?",
+      answer: "Telemedicine is suitable for many non-emergency medical needs. Our team can help determine if it's right for you."
+    }
+  ];
+
   return (
     <div className="page-wrapper">
       <Navbar />
@@ -33,9 +66,9 @@ function Contact() {
         <div className="hero-background"></div>
         <div className="container hero-content">
           <div className="text-center mb-5 animate-fadeInUp">
-            <h1 className="display-4 text-white mb-3">Contact TeleMed</h1>
+            <h1 className="display-4 text-white mb-3">Get in Touch</h1>
             <p className="lead text-white-50">
-              We're here to help and answer any questions you might have
+              Have questions? We're here to help 24/7
             </p>
           </div>
         </div>
@@ -129,69 +162,39 @@ function Contact() {
 
             {/* Contact Information */}
             <div className="col-lg-5 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+              {/* Office Locations */}
               <div className="feature-card mb-4">
-                <h3 className="h4 mb-4">Contact Information</h3>
-                <div className="d-flex align-items-center mb-3">
-                  <div className="me-3">
-                    <i className="fas fa-location-dot fa-lg" style={{ color: 'var(--primary-color)' }}></i>
+                <h3 className="h4 mb-4">Our Offices</h3>
+                {officeLocations.map((location, index) => (
+                  <div key={index} className="d-flex align-items-start mb-4">
+                    <div className="me-3">
+                      <i className="fas fa-location-dot fa-lg text-primary"></i>
+                    </div>
+                    <div>
+                      <h4 className="h6 mb-1">{location.city}</h4>
+                      <p className="mb-1 text-muted">{location.address}</p>
+                      <p className="mb-0 text-primary">{location.phone}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="h6 mb-1">Address</h4>
-                    <p className="mb-0 text-muted">123 Healthcare Lane, Medical City, HC 12345</p>
-                  </div>
-                </div>
-                <div className="d-flex align-items-center mb-3">
-                  <div className="me-3">
-                    <i className="fas fa-phone fa-lg" style={{ color: 'var(--primary-color)' }}></i>
-                  </div>
-                  <div>
-                    <h4 className="h6 mb-1">Phone</h4>
-                    <p className="mb-0 text-muted">(555) 123-4567</p>
-                  </div>
-                </div>
-                <div className="d-flex align-items-center">
-                  <div className="me-3">
-                    <i className="fas fa-envelope fa-lg" style={{ color: 'var(--primary-color)' }}></i>
-                  </div>
-                  <div>
-                    <h4 className="h6 mb-1">Email</h4>
-                    <p className="mb-0 text-muted">support@telemed.com</p>
-                  </div>
-                </div>
+                ))}
               </div>
 
-              <div className="feature-card">
-                <h3 className="h4 mb-4">Support Hours</h3>
-                <div className="d-flex justify-content-between mb-2">
-                  <span className="text-muted">Monday - Friday</span>
-                  <span className="fw-medium">8am - 8pm EST</span>
-                </div>
-                <div className="d-flex justify-content-between mb-2">
-                  <span className="text-muted">Saturday</span>
-                  <span className="fw-medium">10am - 4pm EST</span>
-                </div>
-                <div className="d-flex justify-content-between">
-                  <span className="text-muted">Sunday</span>
-                  <span className="fw-medium">Closed</span>
-                </div>
+              {/* FAQ Section */}
+              <div className="feature-card mb-4">
+                <h3 className="h4 mb-4">Frequently Asked Questions</h3>
+                {faqItems.map((item, index) => (
+                  <div key={index} className="mb-4">
+                    <h4 className="h6 mb-2">{item.question}</h4>
+                    <p className="text-muted mb-0">{item.answer}</p>
+                  </div>
+                ))}
               </div>
 
-              <div className="info-section mt-4 text-center">
-                <h3 className="h4 mb-4">Follow Us</h3>
-                <div className="d-flex justify-content-center gap-4">
-                  <a href="#" className="text-white text-decoration-none">
-                    <i className="fab fa-facebook fa-2x"></i>
-                  </a>
-                  <a href="#" className="text-white text-decoration-none">
-                    <i className="fab fa-twitter fa-2x"></i>
-                  </a>
-                  <a href="#" className="text-white text-decoration-none">
-                    <i className="fab fa-instagram fa-2x"></i>
-                  </a>
-                  <a href="#" className="text-white text-decoration-none">
-                    <i className="fab fa-linkedin fa-2x"></i>
-                  </a>
-                </div>
+              {/* Emergency Contact */}
+              <div className="feature-card bg-primary text-white">
+                <h3 className="h4 mb-3">24/7 Emergency Support</h3>
+                <p className="mb-2">For urgent medical concerns:</p>
+                <h4 className="h3 mb-0">1-800-TELEMED</h4>
               </div>
             </div>
           </div>

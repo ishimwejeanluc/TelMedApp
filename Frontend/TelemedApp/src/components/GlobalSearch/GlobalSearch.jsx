@@ -142,34 +142,44 @@ const GlobalSearch = ({ onMenuItemClick }) => {
         </div>
       )}
 
-      {searchResults.length > 0 && (
+      {searchTerm.length >= 2 && !isSearching && !searchError && (
         <div className={styles.searchResults}>
-          {searchResults.map((result) => (
-            <div
-              key={`${result.type}-${result.id}`}
-              className={styles.searchResult}
-              onClick={() => handleSearchResultClick(result)}
-            >
-              <div className={styles.resultIcon}>
-                {getResultIcon(result.type)}
-              </div>
-              <div className={styles.resultInfo}>
-                <div className={styles.resultName}>{result.name}</div>
-                <div className={styles.resultType}>
-                  {result.type.charAt(0).toUpperCase() + result.type.slice(1)}
+          {searchResults.length > 0 ? (
+            searchResults.map((result) => (
+              <div
+                key={`${result.type}-${result.id}`}
+                className={styles.searchResult}
+                onClick={() => handleSearchResultClick(result)}
+              >
+                <div className={styles.resultIcon}>
+                  {getResultIcon(result.type)}
                 </div>
-                {result.details && (
-                  <div className={styles.resultDetails}>
-                    {result.details}
+                <div className={styles.resultInfo}>
+                  <div className={styles.resultName}>{result.name}</div>
+                  <div className={styles.resultType}>
+                    {result.type.charAt(0).toUpperCase() + result.type.slice(1)}
                   </div>
-                )}
+                  {result.details && (
+                    <div className={styles.resultDetails}>
+                      {result.details}
+                    </div>
+                  )}
+                </div>
               </div>
+            ))
+          ) : (
+            <div className={styles.noResults}>
+              <div className={styles.noResultsIcon}>
+                <FaSearch />
+              </div>
+              <p>No results found for "{searchTerm}"</p>
+              <span>Try different keywords or check spelling</span>
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>
   );
 };
 
-export default GlobalSearch; 
+export default GlobalSearch;

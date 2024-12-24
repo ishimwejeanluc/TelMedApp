@@ -28,6 +28,7 @@ const DoctorTestResults = () => {
     type: '',
     show: false
   });
+  const [filteredAppointments, setFilteredAppointments] = useState([]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -123,6 +124,17 @@ const DoctorTestResults = () => {
 
     fetchDoctorDataAndAppointments();
   }, [isAuthenticated, user, navigate]);
+
+  useEffect(() => {
+    if (selectedPatient) {
+      const patientAppointments = appointments.filter(
+        apt => apt.patient.id === selectedPatient
+      );
+      setFilteredAppointments(patientAppointments);
+    } else {
+      setFilteredAppointments([]);
+    }
+  }, [selectedPatient, appointments]);
 
   const showNotification = (message, type) => {
     setNotification({
@@ -231,7 +243,10 @@ const DoctorTestResults = () => {
                   <select
                     name="patient"
                     value={selectedPatient}
-                    onChange={(e) => setSelectedPatient(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedPatient(e.target.value);
+                      setSelectedAppointment('');
+                    }}
                     className="form-control"
                     required
                   >
@@ -244,6 +259,28 @@ const DoctorTestResults = () => {
                   </select>
                 </div>
 
+                {selectedPatient && (
+                  <div className="form-group">
+                    <label>Appointment</label>
+                    <select
+                      name="appointment"
+                      value={selectedAppointment}
+                      onChange={(e) => setSelectedAppointment(e.target.value)}
+                      className="form-control"
+                      required
+                    >
+                      <option value="">Select Appointment</option>
+                      {filteredAppointments.map((apt) => (
+                        <option key={apt.id} value={apt.id}>
+                          {new Date(apt.date).toLocaleDateString()} - {apt.time}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              <div className="form-row">
                 <div className="form-group">
                   <label>Test Name</label>
                   <input

@@ -27,11 +27,6 @@ const AdminSidebar = ({ activeItem, onMenuItemClick }) => {
       id: 'appointments',
       label: 'Appointments',
       icon: 'fas fa-calendar-check'
-    },
-    {
-      id: 'results',
-      label: 'Test Results',
-      icon: 'fas fa-file-medical-alt'
     }
   ];
 

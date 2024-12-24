@@ -126,3 +126,29 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 } 
+
+.noResults {
+  padding: 2rem;
+  text-align: center;
+  color: #64748b;
+}
+
+.noResultsIcon {
+  font-size: 2rem;
+  color: #94a3b8;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.noResults p {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #475569;
+  margin-bottom: 0.5rem;
+}
+
+.noResults span {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+  

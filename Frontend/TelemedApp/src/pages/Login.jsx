@@ -147,26 +147,12 @@ const Login = () => {
                 </button>
 
                 <div className="text-center">
-                  <p className="mb-4">
+                  <p className="mb-0">
                     Don't have an account? {' '}
                     <a href="/register" className="text-primary text-decoration-none">
                       Create Account
                     </a>
                   </p>
-
-                  <div className="text-muted mb-4">Or login with</div>
-                  
-                  <div className="d-flex justify-content-center gap-3">
-                    <button type="button" className="btn btn-outline-secondary rounded-circle">
-                      <i className="fab fa-google"></i>
-                    </button>
-                    <button type="button" className="btn btn-outline-secondary rounded-circle">
-                      <i className="fab fa-facebook-f"></i>
-                    </button>
-                    <button type="button" className="btn btn-outline-secondary rounded-circle">
-                      <i className="fab fa-apple"></i>
-                    </button>
-                  </div>
                 </div>
               </form>
             </div>
