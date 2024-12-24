@@ -4,6 +4,7 @@ import TelemedApp.ac.rw.Telemed.modal.User;
 import TelemedApp.ac.rw.Telemed.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -12,8 +13,6 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
-
-   
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -43,5 +42,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    
+    public User updatePassword(User user) {
+        return userRepository.save(user);
+    }
 }

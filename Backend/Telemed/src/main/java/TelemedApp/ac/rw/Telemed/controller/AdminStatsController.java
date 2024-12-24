@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/admin/stats")
+@RequestMapping("/api/admin/stats")
 @CrossOrigin
 public class AdminStatsController {
 
