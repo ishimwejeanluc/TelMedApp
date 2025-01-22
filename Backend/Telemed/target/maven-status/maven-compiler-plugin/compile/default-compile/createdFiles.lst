@@ -4,9 +4,12 @@ TelemedApp\ac\rw\Telemed\modal\Gender.class
 TelemedApp\ac\rw\Telemed\modal\User.class
 TelemedApp\ac\rw\Telemed\repository\UserRepository.class
 TelemedApp\ac\rw\Telemed\service\TestResultService.class
+TelemedApp\ac\rw\Telemed\service\EmailService.class
 TelemedApp\ac\rw\Telemed\controller\TestResultController.class
+TelemedApp\ac\rw\Telemed\controller\PatientDashboardController.class
 TelemedApp\ac\rw\Telemed\security\SHA256PasswordEncoder.class
 TelemedApp\ac\rw\Telemed\Configuration\JacksonConfig.class
+TelemedApp\ac\rw\Telemed\dto\PatientDTO.class
 TelemedApp\ac\rw\Telemed\modal\TestResult.class
 TelemedApp\ac\rw\Telemed\service\UserService.class
 TelemedApp\ac\rw\Telemed\repository\MedicalRecordRepository.class
@@ -22,9 +25,12 @@ TelemedApp\ac\rw\Telemed\service\MedicalRecordService.class
 TelemedApp\ac\rw\Telemed\modal\Patient.class
 TelemedApp\ac\rw\Telemed\repository\AppointmentRepository.class
 TelemedApp\ac\rw\Telemed\controller\SearchController.class
+TelemedApp\ac\rw\Telemed\dto\AppointmentDTO.class
 TelemedApp\ac\rw\Telemed\modal\SearchResult.class
 TelemedApp\ac\rw\Telemed\repository\DoctorRepository.class
 TelemedApp\ac\rw\Telemed\modal\Doctor.class
+TelemedApp\ac\rw\Telemed\controller\AdminStatsController.class
+TelemedApp\ac\rw\Telemed\dto\DoctorDTO.class
 TelemedApp\ac\rw\Telemed\TelemedApplication.class
 TelemedApp\ac\rw\Telemed\repository\PatientRepository.class
 TelemedApp\ac\rw\Telemed\service\PatientService.class
@@ -34,6 +40,7 @@ TelemedApp\ac\rw\Telemed\service\TwoFactorAuthService.class
 TelemedApp\ac\rw\Telemed\controller\UserController.class
 TelemedApp\ac\rw\Telemed\modal\AccountCreationRequest.class
 TelemedApp\ac\rw\Telemed\service\AppointmentService.class
+TelemedApp\ac\rw\Telemed\util\EmailEncoder.class
 TelemedApp\ac\rw\Telemed\modal\MedicalRecord.class
 TelemedApp\ac\rw\Telemed\service\AuthenticationService.class
 TelemedApp\ac\rw\Telemed\controller\PatientController.class
