@@ -47,10 +47,10 @@ TeleMed is a healthcare application designed to facilitate the management of pat
 ## Images
 Here are some images related to the project:
 
-![Home Page](./images/Screenshot 2024-12-24 022158.jpg)
-![Our Impact](./images/Screenshot 2024-12-24 022407.jpg)
-![Login Page](./images/Screenshot 2024-12-24 022438.jpg)
-![Sign Up Page](./images/Screenshot 2024-12-24 022504.jpg)
+![Home Page](./images/1.jpg)
+![Our Impact](./images/2.jpg)
+![Login Page](./images/3.jpg)
+![Sign Up Page](./images/4.jpg)
 
 ## Getting Started
 
@@ -153,13 +153,6 @@ We welcome contributions to TeleMed! Here's how you can help:
    - Configure Java Mail properties in `application.properties`
    - Set up environment variables for sensitive information
 
-3. **Running Tests**
-   ```bash
-   # Backend tests
-   ./mvnw test
-
-   # Frontend tests
-   npm test
    ```
 
 ## License
@@ -168,8 +161,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Conclusion
 TeleMed aims to streamline healthcare processes by providing a user-friendly interface for managing appointments and medical records. The application is designed to enhance patient engagement and improve the overall healthcare experience.
 
-## Support
-If you encounter any issues or have questions, please:
-1. Check the [Issues](https://github.com/yourusername/TeleMed/issues) page
-2. Create a new issue if your problem isn't already listed
-3. Join our [Discord community](your-discord-link) for real-time support
